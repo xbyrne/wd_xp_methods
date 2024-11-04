@@ -35,12 +35,12 @@ $$ (Andrae+23, GSP-Phot)
 \mathtt{visibility\_periods\_used} \geq 10
 $$ (Lindegren+18)
 
-We used TOPCAT to obtain the sample, which is saved to `data/external/gf21.csv` and contains 1 070 932 rows. Most of these objects will not have XP spectra yet, however...
+We used TOPCAT to obtain the sample, which is saved to `data/external/gf21.csv` and contains 1 070 932 rows. Most of these objects will not have XP spectra, however...
 
 
 ### Obtaining XP spectra for sample
 
-We now obtain the XP spectra for those objects -- at least, the ones which _have_ XP spectra yet. Visiting https://gaia.aip.de/query/
+We now obtain the XP spectra for those objects -- at least, the ones which _have_ XP spectra yet. Visiting https://gaia.aip.de/query/, we must first upload a VOtable. This is carried out by `src/scripts/make_gf21_votable.py`, which creates the file `src/data/interim/gf21_ids.xml`
 
 
 
