@@ -25,13 +25,15 @@ A comparison of different methods for analysing Gaia XP spectra of white dwarfs,
 
 To obtain a good sample of WDs whose XP spectra to analyse, we use the query in `src/queries/gf21.sql` to obtain data from the catalogue of Gentile Fusillo+24 (hereafter GF+24). This query uses similar selection criteria to PC+24, but is slightly more inclusive:
 
-1. $$
+1.
+$$
 \mathtt{phot\_xp\_n\_obs} \geq \begin{cases}
 10 & \mathtt{x}=\mathtt{r}\\
 15 & \mathtt{x}=\mathtt{b}
 \end{cases}
 $$ (Andrae+23, GSP-Phot)
-2. $$
+2.
+$$
 \mathtt{visibility\_periods\_used} \geq 10
 $$ (Lindegren+18)
 
@@ -40,7 +42,11 @@ We used TOPCAT to obtain the sample, which is saved to `data/external/gf21.csv` 
 
 ### Obtaining XP spectra for sample
 
-We now obtain the XP spectra for those objects -- at least, the ones which _have_ XP spectra yet. Visiting https://gaia.aip.de/query/, we must first upload a VOtable. This is carried out by `src/scripts/make_gf21_votable.py`, which creates the file `src/data/interim/gf21_ids.xml`
+We now obtain the XP spectra for those objects -- at least, the ones which _have_ XP spectra yet. Visiting https://gaia.aip.de/query/, we must first upload a VOtable. This is carried out by `src/scripts/make_gf21_votable.py`, which creates the file `src/data/interim/gf21_ids.xml`.
+
+Upload this .xml file to Gaia@AIP at the above link under 'Upload VOTable' (NB: you probably need an account), and name it gf21_ids. It should then appear in the 'Job list' panel. Copy the query in `src/queries/gaia_aip_xp.sql` into the SQL query box, making sure to replace `<username>` with your actual username. Change the Table name field to gf21_xp, and change the Queue time to 5 minutes. When I do this, it takes about 50 seconds to complete the join.
+
+After the job is complete, click the Download tab and download the csv file (which may a minute or two to assemble as the table is a few GB). Save the file to `./data/external/gf21_xp.csv`.
 
 
 
