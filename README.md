@@ -48,17 +48,38 @@ Upload this .xml file to Gaia@AIP at the above link under 'Upload VOTable' (NB: 
 
 After the job is complete, click the Download tab and download the csv file (which may a minute or two to assemble as the table is a few GB). Save the file to `./data/external/gf21_xp.csv`.
 
+### Process XP spectra
 
+Now that we have the XP coefficients downloaded, we need to get them into a nicer form than a .csv file.
+This is achieved by the `process_xp.py` program, which creates two .npz files:
+1. `data/interim/xp_coefficients.npz`
+    - `ids` -- the Gaia EDR3 IDs
+    - `xp` -- the XP coefficients
+    - `xp_err` -- the errors on the XP coefficients
+2. `data/interim/xp_sampledspectra.npz`
+    - `ids` -- "
+    - `wlen` -- wavelengths at which the spectra are sampled
+    - `flux` -- flux in the spectrum
+
+The latter makes use of the `GaiaXPy` package (Gaia Collaboration, Montegriffo+22).
+
+
+
+### TODO: obtain a labelled subset
 
 We also obtain a subset of this for which a spectral classification exists
 
 1. Use MWDD?
 2. Use GF+21's other catalogue?
 
+
+
+
 ---
 ## References
 
 Andrae+23
+Gaia Collaboration, Montegriffo+22
 Gentile Fusillo+24
 Kao+24
 Lindegren+18
