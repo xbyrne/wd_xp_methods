@@ -5,7 +5,18 @@ A comparison of different methods for analysing Gaia XP spectra of white dwarfs,
 
 ## Plan
 
-1. Assemble dataset (let's use the set union of those used by Kao+24, Perez-Couto+24, and Vincent+24)
+1. Assemble dataset. We'll just use the following constraints:
+    1. $$
+\mathtt{phot\_xp\_n\_obs} \geq \begin{cases}
+10 & \mathtt{x}=\mathtt{r}\\
+15 & \mathtt{x}=\mathtt{b}
+\end{cases}
+$$ (Andrae+23, GSP-Phot)
+    2. $$
+\mathtt{visibility\_periods\_used} \geq 10
+$$ (Lindegren+18)
+
+and that's it.
 
     1. Construct SQL query to use in TOPCAT on GF+21
     2. Write it up somewhere, later in the README perhaps
@@ -26,14 +37,26 @@ A comparison of different methods for analysing Gaia XP spectra of white dwarfs,
 
 ## Data selection
 
-### Sample from GF+24
+### Sample from GF+21
 
-The following SQL query was used for data collection. We used TOPCAT on the VizieR dataset J/MNRAS/...
+The following SQL query was used for sample selection from Gaia EDR3. To obtain the data we used TOPCAT to post the following query to the VizieR dataset `J/MNRAS/508/3877/maincat` (the main catalogue of Gentile Fusillo+21, hereafter GF+21)
 
 ```sql
 SELECT
-...
+    WDJname, GaiaEDR3,
+    RA_ICRS, DE_ICRS, Plx,
+    "Gmag", BPmag, RPmag,  -- "Gmag" to avoid confusion with GMAG
+    o_BPmag, o_RPmag  -- phot_xp_n_obs
+    Nper,             -- visibility_periods_used
+    RUWE, Pwd, TeffH,
+    RFBP, RFRP        -- integrated XP flux over error
+FROM "J/MNRAS/508/3877/maincat"
+WHERE
+    o_BPmag >= 10 AND -- phot_bp_n_obs (Andrae+23)
+    o_RPmag >= 15 AND -- phot_rp_n_obs (")
+    Nper >= 10        -- visibility_periods_used (Lindegren+18)
 ```
+Save the resulting table to `./src/data/external/gf21.csv`.
 
 We also obtain a subset of this for which a spectral classification exists
 
