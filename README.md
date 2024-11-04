@@ -5,25 +5,9 @@ A comparison of different methods for analysing Gaia XP spectra of white dwarfs,
 
 ## Plan
 
-1. Assemble dataset. We'll just use the following constraints:
-    1. $$
-\mathtt{phot\_xp\_n\_obs} \geq \begin{cases}
-10 & \mathtt{x}=\mathtt{r}\\
-15 & \mathtt{x}=\mathtt{b}
-\end{cases}
-$$ (Andrae+23, GSP-Phot)
-    2. $$
-\mathtt{visibility\_periods\_used} \geq 10
-$$ (Lindegren+18)
+1. Assemble dataset from GF+21 [x]
 
-and that's it.
-
-    1. Construct SQL query to use in TOPCAT on GF+21
-    2. Write it up somewhere, later in the README perhaps
-
-2. Obtain the XP spectra for this sample
-    1. Download from Gaia@AIP?
-    2. Find out how PC+24 did it pythonically?
+2. Obtain the XP spectra for this sample from Gaia@AIP
 
 3. Apply / reproduce methods
 
@@ -37,26 +21,28 @@ and that's it.
 
 ## Data selection
 
-### Sample from GF+21
+### Obtaining WD candidate sample from GF+21
 
-The following SQL query was used for sample selection from Gaia EDR3. To obtain the data we used TOPCAT to post the following query to the VizieR dataset `J/MNRAS/508/3877/maincat` (the main catalogue of Gentile Fusillo+21, hereafter GF+21)
+To obtain a good sample of WDs whose XP spectra to analyse, we use the query in `src/queries/gf21.sql` to obtain data from the catalogue of Gentile Fusillo+24 (hereafter GF+24). This query uses similar selection criteria to PC+24, but is slightly more inclusive:
 
-```sql
-SELECT
-    WDJname, GaiaEDR3,
-    RA_ICRS, DE_ICRS, Plx,
-    "Gmag", BPmag, RPmag,  -- "Gmag" to avoid confusion with GMAG
-    o_BPmag, o_RPmag  -- phot_xp_n_obs
-    Nper,             -- visibility_periods_used
-    RUWE, Pwd, TeffH,
-    RFBP, RFRP        -- integrated XP flux over error
-FROM "J/MNRAS/508/3877/maincat"
-WHERE
-    o_BPmag >= 10 AND -- phot_bp_n_obs (Andrae+23)
-    o_RPmag >= 15 AND -- phot_rp_n_obs (")
-    Nper >= 10        -- visibility_periods_used (Lindegren+18)
-```
-Save the resulting table to `./src/data/external/gf21.csv`.
+1. $$
+\mathtt{phot\_xp\_n\_obs} \geq \begin{cases}
+10 & \mathtt{x}=\mathtt{r}\\
+15 & \mathtt{x}=\mathtt{b}
+\end{cases}
+$$ (Andrae+23, GSP-Phot)
+2. $$
+\mathtt{visibility\_periods\_used} \geq 10
+$$ (Lindegren+18)
+
+We used TOPCAT to obtain the sample, which is saved to `data/external/gf21.csv` and contains 1 070 932 rows. Most of these objects will not have XP spectra yet, however...
+
+
+### Obtaining XP spectra for sample
+
+We now obtain the XP spectra for those objects -- at least, the ones which _have_ XP spectra yet. Visiting https://gaia.aip.de/query/
+
+
 
 We also obtain a subset of this for which a spectral classification exists
 
@@ -66,7 +52,9 @@ We also obtain a subset of this for which a spectral classification exists
 ---
 ## References
 
+Andrae+23
 Gentile Fusillo+24
 Kao+24
+Lindegren+18
 Perez-Couto+24
 Vincent+24
