@@ -7,9 +7,9 @@ A comparison of different methods for analysing Gaia XP spectra of white dwarfs,
 
 1. Assemble dataset from GF+21 [x]
 
-2. Obtain the XP spectra for this sample from Gaia@AIP
+2. Obtain the XP spectra for this sample from Gaia@AIP [x]
 
-3. Apply / reproduce methods
+3. Apply / reproduce methods []
 
     1. UMAP (Kao+24)
     2. tSNE
