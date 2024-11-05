@@ -13,8 +13,13 @@ A comparison of different methods for analysing Gaia XP spectra of white dwarfs,
     1. UMAP (Kao+24) [x]
     2. tSNE [x]
     3. Contrastive Learning []
+        1. Work out noising -- do we really want to resample using the errors from 10^5 objects? Are there any alternatives?
     4. SOMs (PC+24) []
+        1. Ask PC whether they tried just using one SOM?
+        2. Any advice for hyperparameter optimisation?
     5. Standard ML (Vincent+24) []
+        1. Grab his network somehow?
+        2. Reproduce?
 
 
 ## Data selection
