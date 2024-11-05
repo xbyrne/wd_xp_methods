@@ -1,7 +1,6 @@
 # wd_xp_methods
 A comparison of different methods for analysing Gaia XP spectra of white dwarfs, particularly to find polluted WDs
 
----
 
 ## Plan
 
@@ -11,13 +10,12 @@ A comparison of different methods for analysing Gaia XP spectra of white dwarfs,
 
 3. Apply / reproduce methods []
 
-    1. UMAP (Kao+24)
-    2. tSNE
-    3. Contrastive Learning
-    4. SOMs (PC+24)
-    5. Standard ML (Vincent+24)
+    1. UMAP (Kao+24) [x]
+    2. tSNE [x]
+    3. Contrastive Learning []
+    4. SOMs (PC+24) []
+    5. Standard ML (Vincent+24) []
 
----
 
 ## Data selection
 
@@ -25,28 +23,20 @@ A comparison of different methods for analysing Gaia XP spectra of white dwarfs,
 
 To obtain a good sample of WDs whose XP spectra to analyse, we use the query in `src/queries/gf21.sql` to obtain data from the catalogue of Gentile Fusillo+24 (hereafter GF+24). This query uses similar selection criteria to PC+24, but is slightly more inclusive:
 
-1.
-$$
-\mathtt{phot\_xp\_n\_obs} \geq \begin{cases}
-10 & \mathtt{x}=\mathtt{r}\\
-15 & \mathtt{x}=\mathtt{b}
-\end{cases}
-$$ (Andrae+23, GSP-Phot)
-2.
-$$
-\mathtt{visibility\_periods\_used} \geq 10
-$$ (Lindegren+18)
+1. 1. `phot_bp_n_obs` >= 10  (Andrae+23)
+   2. `phot_rp_n_obs` >= 15  (^)
+2. `visibility_periods_used` >= 10  (Lindegren+18)
 
 We used TOPCAT to obtain the sample, which is saved to `data/external/gf21.csv` and contains 1 070 932 rows. Most of these objects will not have XP spectra, however...
 
 
 ### Obtaining XP spectra for sample
 
-We now obtain the XP spectra for those objects -- at least, the ones which _have_ XP spectra yet. Visiting https://gaia.aip.de/query/, we must first upload a VOtable. This is carried out by `src/scripts/make_gf21_votable.py`, which creates the file `src/data/interim/gf21_ids.xml`.
+We now obtain the XP spectra for those objects -- at least, the ones which _have_ XP spectra yet. Visiting https://gaia.aip.de/query/, we must first upload a VOtable. This is carried out by `scripts/make_gf21_votable.py`, which creates the file `data/interim/gf21_ids.xml`.
 
 Upload this .xml file to Gaia@AIP at the above link under 'Upload VOTable' (NB: you probably need an account), and name it gf21_ids. It should then appear in the 'Job list' panel. Copy the query in `src/queries/gaia_aip_xp.sql` into the SQL query box, making sure to replace `<username>` with your actual username. Change the Table name field to gf21_xp, and change the Queue time to 5 minutes. When I do this, it takes about 50 seconds to complete the join.
 
-After the job is complete, click the Download tab and download the csv file (which may a minute or two to assemble as the table is a few GB). Save the file to `./data/external/gf21_xp.csv`.
+After the job is complete, click the Download tab and download the csv file (which may a minute or two to assemble as the table is a few GB). Save the file to `data/external/gf21_xp.csv`.
 
 ### Process XP spectra
 
@@ -73,9 +63,15 @@ We also obtain a subset of this for which a spectral classification exists
 2. Use GF+21's other catalogue?
 
 
+## Applying methods
+
+### UMAP & tSNE
+
+The program `scripts/umap_tsne_xp.py` runs UMAP and tSNE on the sample's XP spectra. A couple of data normalisation methods are found in the `scripts/preprocessors.py` file, including normalising by the G flux (as in Kao+24) or by the L2 norm (as in PC+24). The results don't seem to be affected very strongly by the normalisation chosen.
+
+The UMAP and tSNE embeddings of the XP spectra an be found in `data/processed/umap_xp.npz` and `tsne_xp.npz`.
 
 
----
 ## References
 
 Andrae+23
