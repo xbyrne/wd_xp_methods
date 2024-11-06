@@ -60,9 +60,23 @@ The latter makes use of the `GaiaXPy` package (Gaia Collaboration, Montegriffo+2
 
 ### Obtaining a labelled subset of the WD spectral classes
 
-Gentile Fusillo+21 also visually classify ~40k WD spectra in SDSS which have a match in the main GF21 catalogue. This can be downloaded from TOPCAT as with the main catalogue, using the short query in `queries/gf21_spec.sql`. The resulting dataset, containing just two columns -- Gaia EDR3 IDs and spectral class -- is stored in `data/external/gf21_spec.csv`.
+Gentile Fusillo+21 also visually classify ~40k WD spectra in SDSS which have a match in the main GF21 catalogue. This can be downloaded from TOPCAT as with the main catalogue, using the short query in `queries/gf21_sdss.sql`. The resulting dataset, containing just two columns -- Gaia EDR3 IDs and spectral class -- is stored in `data/external/gf21_sdss.csv`.
 
-We also download the Planetary Enriched White Dwarf Database (PEWDD; Williams+24) to potentially label more WDs as polluted. This is downloaded by the `scripts/download_pewdd.py` program, which saves the database to `data/external/pewdd.csv`.
+We also download the Montreal White Dwarf Database (MWDD; Dufour+17; www.montrealwhitedwarfdatabase.org). On the 'Tables and Charts' page, click the 'Options' button and deselect everything except 'Gaia DR3 ID' and 'Spectral type'. Click 'Export as csv' and save to `data/external/mwdd.csv`.
+
+Finally, we also download the Planetary Enriched White Dwarf Database (PEWDD; Williams+24) to potentially label more WDs as polluted. This is downloaded by the `scripts/download_pewdd.py` program, which saves the database to `data/external/pewdd.csv`.
+
+The program `scripts/check_known_polluted.py` checks all the sources in the sample against these three databases, assembling the dataset `data/interim/is_polluted.csv`. This table contains two columns:
+- The EDR3 ID;
+- True / False / None, according to whether the WD has been classified as polluted:
+    - True: The object has been classified as polluted in any of the three datasets
+    - False: None of the datasets classify the object as polluted (unless any do)
+    - None: It is possible that the object is polluted, but not confirmed.
+
+The details of how these cases are ascertained are given in the docstrings of the `check_{dataset}` functions.
+
+
+#### TODO: upload the data/external folder to zenodo when project done.
 
 
 ## Applying methods
@@ -77,9 +91,11 @@ The UMAP and tSNE embeddings of the XP spectra an be found in `data/processed/um
 ## References
 
 Andrae+23
+Dufour+17
 Gaia Collaboration, Montegriffo+22
 Gentile Fusillo+24
 Kao+24
 Lindegren+18
 Perez-Couto+24
 Vincent+24
+Williams+24

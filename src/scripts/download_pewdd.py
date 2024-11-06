@@ -10,4 +10,4 @@ import pandas as pd
 PEWDD_URL = "https://raw.githubusercontent.com/jamietwilliams/PEWDD/main/PEWDD.csv"
 pewdd = pd.read_csv(PEWDD_URL)
 
-pewdd.to_csv("../data/external/pewdd.csv")
+pewdd.to_csv("../data/external/pewdd.csv", index=False)
