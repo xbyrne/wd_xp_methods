@@ -26,7 +26,7 @@ A comparison of different methods for analysing Gaia XP spectra of white dwarfs,
 
 ### Obtaining WD candidate sample from GF+21
 
-To obtain a good sample of WDs whose XP spectra to analyse, we use the query in `src/queries/gf21.sql` to obtain data from the catalogue of Gentile Fusillo+24 (hereafter GF+24). This query uses similar selection criteria to PC+24, but is slightly more inclusive:
+To obtain a good sample of WDs whose XP spectra to analyse, we use the query in `src/queries/gf21.sql` to obtain data from the catalogue of Gentile Fusillo+21 (hereafter GF+21). This query uses similar selection criteria to PC+24, but is slightly more inclusive:
 
 1. 1. `phot_bp_n_obs` >= 10  (Andrae+23)
    2. `phot_rp_n_obs` >= 15  (^)
@@ -58,14 +58,11 @@ This is achieved by the `process_xp.py` program, which creates two .npz files:
 
 The latter makes use of the `GaiaXPy` package (Gaia Collaboration, Montegriffo+22).
 
+### Obtaining a labelled subset of the WD spectral classes
 
+Gentile Fusillo+21 also visually classify ~40k WD spectra in SDSS which have a match in the main GF21 catalogue. This can be downloaded from TOPCAT as with the main catalogue, using the short query in `queries/gf21_spec.sql`. The resulting dataset, containing just two columns -- Gaia EDR3 IDs and spectral class -- is stored in `data/external/gf21_spec.csv`.
 
-### TODO: obtain a labelled subset
-
-We also obtain a subset of this for which a spectral classification exists
-
-1. Use MWDD?
-2. Use GF+21's other catalogue?
+We also download the Planetary Enriched White Dwarf Database (PEWDD; Williams+24) to potentially label more WDs as polluted. This is downloaded by the `scripts/download_pewdd.py` program, which saves the database to `data/external/pewdd.csv`.
 
 
 ## Applying methods
