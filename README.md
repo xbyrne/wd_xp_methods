@@ -68,12 +68,12 @@ Finally, we also download the Planetary Enriched White Dwarf Database (PEWDD; Wi
 
 The program `scripts/check_known_polluted.py` checks all the sources in the sample against these three databases, assembling the dataset `data/interim/is_polluted.csv`. This table contains two columns:
 - The EDR3 ID;
-- True / False / None, according to whether the WD has been classified as polluted:
-    - True: The object has been classified as polluted in any of the three datasets
-    - False: None of the datasets classify the object as polluted (unless any do)
-    - None: It is possible that the object is polluted, but not confirmed.
+- 1 / 0 / -1, according to whether the WD has been classified as polluted:
+    - 1: The object has been classified as polluted in any of the three datasets
+    - 0: None of the datasets classify the object as polluted (unless any do)
+    - -1: It is *possible* that the object is polluted, but not confirmed.
 
-The details of how these cases are ascertained are given in the docstrings of the `check_{dataset}` functions.
+The details of how these cases are ascertained are given in the docstrings of the `check_{dataset}` functions. The dataset `is_polluted.csv` contains 858 (0.8%) known polluted WDs, 12638 (11.8%) known *un*-polluted WDs, and 93668 (87.4%) whose classification is uncertain.
 
 
 #### TODO: upload the data/external folder to zenodo when project done.

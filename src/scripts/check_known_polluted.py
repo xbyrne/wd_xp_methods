@@ -5,9 +5,9 @@ Checks PEWDD, MWDD, and GF21xSDSS for whether a WD is polluted.
 Stores a csv file with two columns:
 - Gaia EDR3 ID
 - isPolluted:
-    - `True` if the object has been classified as polluted in any of the datasets
-    - `False` if none of the datasets classify the object as polluted, unless any *do*
-    - `None` if it is possible that the object is polluted, but not confirmed
+    - 1 if the object has been classified as polluted in any of the datasets
+    - 0 if none of the datasets classify the object as polluted, unless any *do*
+    - -1 if it is possible that the object is polluted, but not confirmed
 Inspect `check_{dataset}` functions for more details on how the classification is done.
 """
 
@@ -40,7 +40,7 @@ mwdd = mwdd.loc[
 # PEWDD
 pewdd = pd.read_csv("../data/external/pewdd.csv")  # 3546 rows, from Github 2024-11-06
 pewdd.set_index("Gaia_designation", inplace=True)
-pewdd = pewdd[pewdd.index.str.startswith("Gaia DR3") == True]  # 3546 -> 2979
+pewdd = pewdd[pewdd.index.fillna("").str.startswith("Gaia DR3")]  # 3546 -> 2979
 pewdd.index = pewdd.index.str.replace("Gaia DR3 ", "").astype(int)
 
 
@@ -54,25 +54,25 @@ def check_whether_obj_polluted(id_):
     Checks whether a WD with a given Gaia EDR3 ID is polluted.
     Checks GF21xSDSS, PEWDD, and MWDD, and decides based on those.
     Examples:
-    - (True, None, None) -> True
-    - (False, None, None) -> False
-    - (None, None, None) -> None
-    - (True, None, False) -> True
+    - (1, -1, -1) -> 1  (If any of the datasets classify the object as polluted)
+    - (0, -1, -1) -> 0  (If a dataset classifies the object as non-polluted)
+    - (-1, -1, -1) -> -1  (None of the datasets are conclusive)
+    - (1, 0, -1) -> 1  (A dataset saying it's polluted supercedes one saying it's not)
     """
     gf21sdss_polluted = check_gf21sdss(id_)
     mwdd_polluted = check_mwdd(id_)
     pewdd_polluted = check_pewdd(id_)
+    checklist = np.array([gf21sdss_polluted, mwdd_polluted, pewdd_polluted])
 
-    if any([gf21sdss_polluted, mwdd_polluted, pewdd_polluted]):
-        # (True, True, True), (True, True, None), (True, True, False),
-        # (True, None, None), (True, None, False), (True, False, False) + cyc.
-        return True
-    if all([gf21sdss_polluted is None, mwdd_polluted is None, pewdd_polluted is None]):
-        # (None, None, None)
-        return None
-    # else
-    # (None, None, False), (None, False, False), (False, False, False) + cyc.
-    return False
+    # If any of the datasets classify the object as polluted, return 1
+    if 1 in checklist:
+        return 1
+    # If any of the datasets classify the object as non-polluted, but
+    # none of them classify it as polluted, return 0
+    if 0 in checklist:
+        return 0
+    # If none of the datasets are conclusive, return -1
+    return -1
 
 
 def check_gf21sdss(id_):
@@ -86,14 +86,14 @@ def check_gf21sdss(id_):
     """
     if id_ in gf21sdss.index:
         cl = gf21sdss.loc[id_, "specClass"]
-        if "Z" in cl and not cl.endswith("Z:"):
-            return True
-        if cl in ["Unreli", "WD", "UNKN"] or cl.endswith("Z:"):
-            return None
+        if "Z" in cl and not cl.endswith("Z:"):  # Polluted
+            return 1
+        if cl in ["Unreli", "WD", "UNKN"] or cl.endswith("Z:"):  # Not sure
+            return -1
         # else
-        return False
+        return 0  # Not polluted
     # else
-    return None
+    return -1  # Not sure - not in GF21xSDSS
 
 
 def check_mwdd(id_):
@@ -107,14 +107,16 @@ def check_mwdd(id_):
     disqualifying_substrings = ["Z?", "Z:", "+", "/"]
     if id_ in mwdd.index:
         cl = mwdd.loc[id_, "spectype"]
-        if "Z" in cl and not any(ss in cl for ss in disqualifying_substrings):
-            return True
-        if cl == "CND":
-            return None
+        if "Z" in cl and not any(
+            ss in cl for ss in disqualifying_substrings
+        ):  # Polluted
+            return 1
+        if cl == "CND":  # Not sure
+            return -1
         # else
-        return False
+        return 0  # Not polluted
     # else
-    return None
+    return -1  # Not sure - not in MWDD
 
 
 def check_pewdd(id_):
@@ -124,10 +126,10 @@ def check_pewdd(id_):
     - True: if the object is in the dataset
     - None: otherwise
     """
-    if id_ in pewdd.index:
-        return True
+    if id_ in pewdd.index:  # Polluted
+        return 1
     # else
-    return None
+    return -1  # Not sure - not in PEWDD
 
 
 if __name__ == "__main__":
@@ -135,4 +137,4 @@ if __name__ == "__main__":
         isp = check_whether_obj_polluted(idd)
         ispolluted.loc[idd, "isPolluted"] = isp
 
-    ispolluted.to_csv("../data/interim/is_polluted.csv")
+    ispolluted.to_csv("../data/interim/is_polluted.csv", index_label="gaiaedr3")
