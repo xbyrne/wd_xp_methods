@@ -76,6 +76,13 @@ The program `scripts/check_known_polluted.py` checks all the sources in the samp
 The details of how these cases are ascertained are given in the docstrings of the `check_{dataset}` functions. The dataset `is_polluted.csv` contains 858 (0.8%) known polluted WDs, 12638 (11.8%) known *un*-polluted WDs, and 93668 (87.4%) whose classification is uncertain.
 
 
+### Others' catalogues
+
+The catalogue of Vincent+24 can be downloaded from https://www.astro.umontreal.ca/~ovincent/catalogues/GSPCWD_catalogue.csv. It should be stored in `data/external/vincent24.csv`.
+
+The catalogue of just the polluted WDs from Garcia-Zamora+23 can be found by querying the VizieR dataset "J/A+A/679/A127/catalog" with the query found in `queries/gz23.sql`. It should be stored in `data/external/gz23.csv`.
+
+
 #### TODO: upload the data/external folder to zenodo when project done.
 
 

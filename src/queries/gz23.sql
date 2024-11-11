@@ -1,0 +1,3 @@
+SELECT GaiaDR3, SPPred
+FROM "J/A+A/679/A127/catalog"
+WHERE SPPred LIKE '%Z%'
