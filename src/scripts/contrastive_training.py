@@ -16,6 +16,7 @@ import contrastive_utils as cutils
 BATCH_SIZE = 32
 LR = 3e-4
 N_EPOCHS = 100
+TEMP = 1.0
 
 # Load the data
 fl = np.load("../data/interim/xp_coeffs.npz")
@@ -27,17 +28,15 @@ xp_err = fl["xp_err"]
 # xp = pp.divide_Gflux(xp, ids)
 # xp_err = pp.divide_Gflux(xp_err, ids)
 
-full_dataset = torch.tensor(xp, dtype=torch.float32)
-dataloader = torch.utils.data.DataLoader(
-    full_dataset, batch_size=BATCH_SIZE, shuffle=True
-)
+dataset = cutils.XPDataset(xp, xp_err)
+dataloader = torch.utils.data.DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True)
 
 # Set up model
 contrastor = cutils.Contrastor(
     cutils.Augmentor(n_sigma=1),
     cutils.Encoder(n_hidden=(256, 128), n_out=64),
-    cutils.Projector(n_hidden=(256, 128), n_out=64),
-    temp=1.0,
+    cutils.Projector(n_in=64, n_hidden=32, n_out=16),
+    temp=TEMP,
     batch_size=BATCH_SIZE,
 )
 
@@ -57,8 +56,8 @@ for epoch in tqdm(range(N_EPOCHS)):
     pbar = tqdm(dataloader)
     for batch in pbar:
         optimiser.zero_grad()
-        loss = contrastor(batch)
+        loss = contrastor.compute_loss(*batch)  # *batch unpacks the xp and xp_err
         loss.backward()
         optimiser.step()
         losses.append(loss.item())
-        pbar.set_description(f"Loss: {loss.item()}")
+        pbar.set_description(f"Loss: {loss.item():.4f}")

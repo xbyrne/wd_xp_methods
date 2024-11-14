@@ -7,8 +7,27 @@ Some tools for implementing contrastive learning.
 import torch
 from torch import nn
 from torch.nn import functional as F
+from torch.utils.data import Dataset
 
 LARGE_NUMBER = 1e9
+
+
+# --------------------------
+# Dataset and Dataloader
+class XPDataset(Dataset):
+    def __init__(self, xp, xp_err):
+        self.xp = torch.tensor(xp, dtype=torch.float32)
+        self.xp_err = torch.tensor(xp_err, dtype=torch.float32)
+
+    def __len__(self):
+        return len(self.xp)
+
+    def __getitem__(self, idx):
+        return self.xp[idx], self.xp_err[idx]
+
+
+# --------------------------
+# Contrastive learning modules
 
 
 class Augmentor(nn.Module):
@@ -73,6 +92,10 @@ class Projector(nn.Module):
         return self.architecture(x)  # (BATCH_SIZE, n_out)
 
 
+# --------------------------
+# Full contrastive learning model
+
+
 class Contrastor(nn.Module):
     """
     Full Contrastor module.
@@ -113,7 +136,7 @@ class Contrastor(nn.Module):
         # | + . 0 . | + = dot product between encodings of same xp spectrum, z_i.z_i*
         # | . + . 0 | . = " " " " different xp spectra
 
-        rolled_matrix = torch.roll(sim_matrix, BATCH_SIZE, 0)  # Translates down
+        rolled_matrix = torch.roll(sim_matrix, batch_size, 0)  # Translates down
         # | + . 0 . |
         # | . + . 0 | Now the positive pairs
         # | 0 . + . | are on the diagonal
