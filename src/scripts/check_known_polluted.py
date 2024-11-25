@@ -18,7 +18,7 @@ from tqdm import tqdm
 fl = np.load("../data/interim/xp_coeffs.npz")
 ids = fl["ids"]  # 107164 Gaia EDR3 IDs
 
-
+# --------------------------
 # Loading external datasets, and selecting the objects which have XP spectra (`ids`)
 # GF21xSDSS
 gf21sdss = pd.read_csv("../data/external/gf21_sdss.csv")  # 41820 rows, from VizieR
@@ -43,12 +43,14 @@ pewdd.set_index("Gaia_designation", inplace=True)
 pewdd = pewdd[pewdd.index.fillna("").str.startswith("Gaia DR3")]  # 3546 -> 2979
 pewdd.index = pewdd.index.str.replace("Gaia DR3 ", "").astype(int)
 
-
+# --------------------------
 # Instantiating the output dataframe
-ispolluted = pd.DataFrame(index=ids, columns=["isPolluted"])
-# isPolluted can be True, False, or None
+ispolluted = pd.DataFrame(index=ids, columns=["is_polluted"])
+# is_polluted can be True, False, or None
 
 
+# --------------------------
+# Functions to check whether a given WD is known to be polluted
 def check_whether_obj_polluted(id_):
     """
     Checks whether a WD with a given Gaia EDR3 ID is polluted.
@@ -135,6 +137,6 @@ def check_pewdd(id_):
 if __name__ == "__main__":
     for idd in tqdm(ids):
         isp = check_whether_obj_polluted(idd)
-        ispolluted.loc[idd, "isPolluted"] = isp
+        ispolluted.loc[idd, "is_polluted"] = isp
 
     ispolluted.to_csv("../data/interim/is_polluted.csv", index_label="gaiaedr3")
