@@ -115,12 +115,11 @@ class Contrastor(nn.Module):
         h = self.encoder(x)
         return self.projector(h)
 
-    def compute_loss(self, xp_batch_, xp_err_batch_, temp=None, batch_size=None):
+    def compute_loss(self, xp_batch_, xp_err_batch_, temp=None):
         """
         Computes the contrastive loss. Uses NT-Xent.
         """
-        if batch_size is None:
-            batch_size = self.batch_size
+        batch_size = xp_batch_.shape[0]
         if temp is None:
             temp = self.temp
         z1 = self.forward(xp_batch_, xp_err_batch_)  # (BATCH_SIZE, n_out)

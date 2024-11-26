@@ -9,7 +9,7 @@ import numpy as np
 import torch
 from accelerate import Accelerator
 
-# import preprocessors as pp
+import preprocessors as pp
 import contrastive_utils as cutils
 
 # Constants & hyperparameters
@@ -25,15 +25,15 @@ xp = fl["xp"]
 xp_err = fl["xp_err"]
 
 # Preprocessing?
-# xp = pp.divide_Gflux(xp, ids)
-# xp_err = pp.divide_Gflux(xp_err, ids)
+xp = pp.divide_Gflux(xp, ids)
+xp_err = pp.divide_Gflux(xp_err, ids)
 
 dataset = cutils.XPDataset(xp, xp_err)
 dataloader = torch.utils.data.DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True)
 
 # Set up model
 contrastor = cutils.Contrastor(
-    cutils.Augmentor(n_sigma=1),
+    cutils.Augmentor(n_sigma=3),
     cutils.Encoder(n_hidden=(256, 128), n_out=64),
     cutils.Projector(n_in=64, n_hidden=32, n_out=16),
     temp=TEMP,
