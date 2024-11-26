@@ -15,38 +15,24 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-fl = np.load("../data/interim/xp_coeffs.npz")
-ids = fl["ids"]  # 107164 Gaia EDR3 IDs
-
 # --------------------------
 # Loading external datasets, and selecting the objects which have XP spectra (`ids`)
 # GF21xSDSS
 gf21sdss = pd.read_csv("../data/external/gf21_sdss.csv")  # 41820 rows, from VizieR
 gf21sdss.drop_duplicates(subset="GaiaEDR3", inplace=True)  # 41820 -> 32169
 gf21sdss.set_index("GaiaEDR3", inplace=True)
-gf21sdss = gf21sdss.loc[
-    list(set(gf21sdss.index).intersection(set(ids)))  # In both GF21xSDSS and XP sample
-]  # 32169 -> 10936
 
 # MWDD
 mwdd = pd.read_csv("../data/external/mwdd.csv")  # 70698 rows, from MWDD 2024-11-06
 mwdd.drop_duplicates(subset="gaiaedr3", inplace=True)  # 70698 -> 61198
 mwdd.dropna(inplace=True)  # 61198 -> 56745
 mwdd.set_index("gaiaedr3", inplace=True)
-mwdd = mwdd.loc[
-    list(set(mwdd.index).intersection(set(ids)))  # In both MWDD and XP sample
-]  # 56745 -> 11939
 
 # PEWDD
 pewdd = pd.read_csv("../data/external/pewdd.csv")  # 3546 rows, from Github 2024-11-06
 pewdd.set_index("Gaia_designation", inplace=True)
 pewdd = pewdd[pewdd.index.fillna("").str.startswith("Gaia DR3")]  # 3546 -> 2979
 pewdd.index = pewdd.index.str.replace("Gaia DR3 ", "").astype(int)
-
-# --------------------------
-# Instantiating the output dataframe
-ispolluted = pd.DataFrame(index=ids, columns=["is_polluted"])
-# is_polluted can be True, False, or None
 
 
 # --------------------------
@@ -135,8 +121,14 @@ def check_pewdd(id_):
 
 
 if __name__ == "__main__":
+
+    fl = np.load("../data/interim/xp_coeffs.npz")
+    ids = fl["ids"]  # 107164 Gaia EDR3 IDs
+
+    ispolluted = pd.DataFrame(index=ids.astype(str), columns=["is_polluted"])
+
     for idd in tqdm(ids):
-        isp = check_whether_obj_polluted(idd)
-        ispolluted.loc[idd, "is_polluted"] = isp
+        ISP = check_whether_obj_polluted(idd)
+        ispolluted.loc[idd, "is_polluted"] = ISP
 
     ispolluted.to_csv("../data/interim/is_polluted.csv", index_label="gaiaedr3")
