@@ -1,37 +1,37 @@
 """
-check_known_polluted.py
-=======================
-Checks PEWDD, MWDD, and GF21xSDSS for whether a WD is polluted.
-Stores a csv file with two columns:
-- Gaia EDR3 ID
-- isPolluted:
-    - 1 if the object has been classified as polluted in any of the datasets
-    - 0 if none of the datasets classify the object as polluted, unless any *do*
-    - -1 if it is possible that the object is polluted, but not confirmed
-Inspect `check_{dataset}` functions for more details on how the classification is done.
+evaluate_existing_methods.py
+============================
+Evaluates the methods of Garcia-Zamora+23, Vincent+24, and Kao+24 (if available)
+in selecting polluted WDs.
 """
 
 import numpy as np
 import pandas as pd
-from tqdm import tqdm
 
 # --------------------------
 # Loading external datasets
+
 # GF21xSDSS
-gf21sdss = pd.read_csv("../data/external/gf21_sdss.csv")  # 41820 rows, from VizieR
+gf21sdss = pd.read_csv(
+    "../data/external/evaluation/gf21_sdss.csv"
+)  # 41820 rows, from VizieR
 gf21sdss.drop_duplicates(subset="GaiaEDR3", inplace=True)  # 41820 -> 32169
 gf21sdss.set_index("GaiaEDR3", inplace=True)
 gf21sdss_index = set(gf21sdss.index.values)  # For faster checking
 
 # MWDD
-mwdd = pd.read_csv("../data/external/mwdd.csv")  # 70698 rows, from MWDD 2024-11-06
+mwdd = pd.read_csv(
+    "../data/external/evaluation/mwdd.csv"
+)  # 70698 rows, from MWDD 2024-11-06
 mwdd.drop_duplicates(subset="gaiaedr3", inplace=True)  # 70698 -> 61198
 mwdd.dropna(inplace=True)  # 61198 -> 56745
 mwdd.set_index("gaiaedr3", inplace=True)
 mwdd_index = set(mwdd.index.values)  # For faster checking
 
 # PEWDD
-pewdd = pd.read_csv("../data/external/pewdd.csv")  # 3546 rows, from Github 2024-11-06
+pewdd = pd.read_csv(
+    "../data/external/evaluation/pewdd.csv"
+)  # 3546 rows, from Github 2024-11-06
 pewdd.set_index("Gaia_designation", inplace=True)
 pewdd = pewdd[pewdd.index.fillna("").str.startswith("Gaia DR3")]  # 3546 -> 2979
 pewdd.index = pewdd.index.str.replace("Gaia DR3 ", "").astype(int)
@@ -130,16 +130,58 @@ def check_pewdd(id_):
 
 
 if __name__ == "__main__":
+    # --------------------------
+    # Garcia-Zamora+23
+    gz23 = pd.read_csv("../data/external/previous_work/garciazamora23.csv", index_col=0)
+    gz23_DxZ = gz23.query("SPPred.str.contains('Z')")  # DZ, DAZ, DBZA...
 
-    fl = np.load("../data/interim/xp_coeffs.npz")
-    ids = fl["ids"]  # 107164 Gaia EDR3 IDs
+    is_polluted_gz23 = pd.DataFrame(index=gz23_DxZ.index, columns=["is_polluted"])
+    isp_gz23 = np.zeros_like(gz23_DxZ.index, dtype=int)
 
-    ispolluted = pd.DataFrame(index=ids.astype(str), columns=["is_polluted"])
-    isps = np.zeros_like(ids, dtype=int)
+    for i, idd in enumerate(gz23_DxZ.index):
+        isp_gz23[i] = check_whether_obj_polluted(idd)
+    is_polluted_gz23["is_polluted"] = isp_gz23
 
-    for i, idd in tqdm(enumerate(ids)):
-        ISP = check_whether_obj_polluted(idd)
-        isps[i] = ISP
+    print("Garcia-Zamora+23:")
+    print(is_polluted_gz23["is_polluted"].value_counts())
+    print("\n")
 
-    ispolluted["is_polluted"] = isps
-    ispolluted.to_csv("../data/interim/is_polluted.csv", index_label="gaiaedr3")
+    # --------------------------
+    # Vincent+24
+    vincent24 = pd.read_csv("../data/external/previous_work/vincent24.csv", index_col=0)
+    vincent24_DZ = vincent24[vincent24["spectype"] == "DZ"]
+
+    is_polluted_vincent24 = pd.DataFrame(
+        index=vincent24_DZ.index, columns=["is_polluted"]
+    )
+    isp_vincent24 = np.zeros_like(vincent24_DZ.index, dtype=int)
+
+    for i, idd in enumerate(vincent24_DZ.index):
+        isp_vincent24[i] = check_whether_obj_polluted(idd)
+    is_polluted_vincent24["is_polluted"] = isp_vincent24
+    print("Vincent+24:")
+    print(is_polluted_vincent24["is_polluted"].value_counts())
+    print("\n")
+
+    # --------------------------
+    # Kao+24, if available
+    try:
+        kao24_cool_DZs = pd.read_csv(
+            "../data/external/previous_work/secret/umap_polluted_all.csv", index_col=1
+        )
+    except FileNotFoundError:
+        kao24_cool_DZs = None
+
+    if kao24_cool_DZs is not None:
+        is_polluted_kao24 = pd.DataFrame(
+            index=kao24_cool_DZs.index, columns=["is_polluted"]
+        )
+
+        isp_kao24 = np.zeros_like(kao24_cool_DZs.index, dtype=int)
+        for i, idd in enumerate(kao24_cool_DZs.index):
+            isp_kao24[i] = check_whether_obj_polluted(idd)
+        is_polluted_kao24["is_polluted"] = isp_kao24
+
+        print("Kao+24:")
+        print(is_polluted_kao24["is_polluted"].value_counts())
+        print("\n")

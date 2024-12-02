@@ -22,6 +22,58 @@ A comparison of different methods for analysing Gaia XP spectra of white dwarfs,
         2. Reproduce?
 
 
+## Evaluating previous methods against available datasets
+
+We first evaluate the results of others' attempts to select polluted WDs from Gaia XP spectra, by comparing them to datasets of spectroscopically-confirmed polluted WDs.
+
+### Getting datasets for pollution labelling
+
+We use three datasets to label the pollution of WDs. These are:
+- Gentile Fusillo+21's Gaia-SDSS spectroscopic sample (GF21xSDSS; );
+- Montreal White Dwarf Database (MWDD; Dufour+17);
+- Planetary-Enriched White Dwarf Database (PEWDD; Williams+24);
+
+These datasets, containing spectral classifications of $10^3$-$10^5$ WDs, are used to label WDs as "polluted" (1), "not polluted" (0), or "unknown" (-1). "Polluted" means that at least one of the datasets identifies the WD as polluted. "Not polluted" means that at least one of the datasets identifies the WD as something else, e.g. a DA, and none of them identify it as polluted. 
+
+The datasets are obtained by, respectively:
+- GF21xSDSS: Submit the query `queries/gf21_sdss.sql`, in e.g. TOPCAT;
+- MWDD: Visit montrealwhitedwarfdatabase.org. On the 'Tables and Charts' page, click the 'Options' button and deselect everything except 'Gaia DR3 ID' and 'Spectral type'. Click 'Export as csv'.
+- PEWDD: The dataset can be downloaded from https://github.com/jamietwilliams/PEWDD/blob/main/PEWDD.csv
+
+The datasets are stored in `data/external/evaluation` as `gf21_sdss.csv`, `mwdd.csv`, and `pewdd.csv`.
+
+GF21xSDSS is a stable VizieR catalogue (J/MNRAS/508/3877/sdssspec), but the other two catalogues are actively updated. For reproducibility, these are saved here as they were on Nov 6 2024.
+
+### Datasets produced in previous work
+
+The classifications of García-Zamora+23 and Vincent+24 are, commendably, available online at the VizieR catalogues 'J/A+A/679/A127/catalog' and 'J/A+A/682/A5/catalog' respectively. The queries
+```sql
+SELECT GaiaDR3, SPPred
+FROM "J/A+A/679/A127/catalog"
+```
+and
+```sql
+SELECT GaiaDR3, SpType
+FROM "J/A+A/682/A5/catalog"
+```
+grab the IDs and classifications for all of the WDs in their respective samples. These queries can be given to e.g. TOPCAT. The resulting datasets should be stored under `data/external/previous_work`.
+
+Due to ongoing spectroscopic follow-up surveys, and likely an understandable fear of being poached, the WDs selected by the methods of Kao+24 and Pérez-Couto+24 are not publicly available. Kao+24 do publish the UMAP coordinates of their entire sample (J/ApJ/970/181/catalog), though their selection of in this space of 465 WDs is not public. The 465 WDs have, however, been obtained by personal communication and can hence be evaluated. These are stored in `data/external/previous_work/secret`, which is gitignored to ensure propriety.
+
+### Evaluating previous methods
+
+The program `scripts/evaluate_existing_methods.py` contains a function `check_whether_obj_polluted`, which checks a given Gaia DR3 ID against these three databases. This function returns 1 / 0 / -1, according to whether the WD has been classified as polluted:
+    - 1: The object has been classified as polluted in any of the three datasets
+    - 0: None of the datasets classify the object as polluted (unless any do).
+    - -1: It is *possible* that the object is polluted, but not confirmed.
+
+NB: It is possible that some WDs labelled as not polluted are, in fact, polluted, as the spectra obtained to assign the class in the dataset may not be of sufficiently high resolution to identify metal lines. However, the resolution of the Gaia XP spectra is likely to be even worse, so if something is unpolluted to the level of the spectral classifications in the datasets, pollution will certainly be undetectable in the XP spectra.
+
+The details of how these cases are ascertained (e.g. which classifications are included) are given in the docstrings of the `check_{dataset}` functions.
+
+Running the script `scripts/evaluate_existing_methods.py` outputs the numbers of polluted/non-polluted/unknown WDs claimed by each of the previous works to be polluted. The program still runs if the Kao+24 selection is not available.
+
+
 ## Data selection
 
 ### Obtaining WD candidate sample from GF+21
@@ -57,30 +109,6 @@ This is achieved by the `process_xp.py` program, which creates two .npz files:
     - `flux` -- flux in the spectrum
 
 The latter makes use of the `GaiaXPy` package (Gaia Collaboration, Montegriffo+22).
-
-### Obtaining a labelled subset of the WD spectral classes
-
-Gentile Fusillo+21 also visually classify ~40k WD spectra in SDSS which have a match in the main GF21 catalogue. This can be downloaded from TOPCAT as with the main catalogue, using the short query in `queries/gf21_sdss.sql`. The resulting dataset, containing just two columns -- Gaia EDR3 IDs and spectral class -- is stored in `data/external/gf21_sdss.csv`.
-
-We also download the Montreal White Dwarf Database (MWDD; Dufour+17; www.montrealwhitedwarfdatabase.org). On the 'Tables and Charts' page, click the 'Options' button and deselect everything except 'Gaia DR3 ID' and 'Spectral type'. Click 'Export as csv' and save to `data/external/mwdd.csv`.
-
-Finally, we also download the Planetary Enriched White Dwarf Database (PEWDD; Williams+24) to potentially label more WDs as polluted. This is downloaded by the `scripts/download_pewdd.py` program, which saves the database to `data/external/pewdd.csv`.
-
-The program `scripts/check_known_polluted.py` checks all the sources in the sample against these three databases, assembling the dataset `data/interim/is_polluted.csv`. This table contains two columns:
-- The EDR3 ID;
-- 1 / 0 / -1, according to whether the WD has been classified as polluted:
-    - 1: The object has been classified as polluted in any of the three datasets
-    - 0: None of the datasets classify the object as polluted (unless any do)
-    - -1: It is *possible* that the object is polluted, but not confirmed.
-
-The details of how these cases are ascertained are given in the docstrings of the `check_{dataset}` functions. The dataset `is_polluted.csv` contains 858 (0.8%) known polluted WDs, 12638 (11.8%) known *un*-polluted WDs, and 93668 (87.4%) whose classification is uncertain.
-
-
-### Others' catalogues
-
-The catalogue of Vincent+24 can be downloaded from https://www.astro.umontreal.ca/~ovincent/catalogues/GSPCWD_catalogue.csv. It should be stored in `data/external/vincent24.csv`.
-
-The catalogue of just the polluted WDs from Garcia-Zamora+23 can be found by querying the VizieR dataset "J/A+A/679/A127/catalog" with the query found in `queries/gz23.sql`. It should be stored in `data/external/gz23.csv`.
 
 
 #### TODO: upload the data/external folder to zenodo when project done.
