@@ -19,6 +19,8 @@ def make_votable(df):
 
 
 if __name__ == "__main__":
-    gf21 = pd.read_csv("../data/external/gf21.csv")
+    gf21 = pd.read_csv("../data/interim/gf21_filtered.csv")
     table = make_votable(gf21)
-    table.write("../data/interim/gf21_ids.xml", format="votable", overwrite=True)
+    table.write(
+        "../data/interim/gf21_filtered_ids.xml", format="votable", overwrite=True
+    )

@@ -13,7 +13,7 @@ SELECT
 FROM
 	gaiadr3.xp_continuous_mean_spectrum as xp
 JOIN
-	gaia_user_<username>.gf21_ids as wds
+	gaia_user_<username>.gf21_filtered as wds
 --    Replace ^^^^^^^^^^ with your username
 ON
 	xp.source_id = wds."GaiaEDR3"

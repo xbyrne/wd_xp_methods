@@ -29,14 +29,14 @@ We first evaluate the results of others' attempts to select polluted WDs from Ga
 ### Getting datasets for pollution labelling
 
 We use three datasets to label the pollution of WDs. These are:
-- Gentile Fusillo+21's Gaia-SDSS spectroscopic sample (GF21xSDSS; );
+- Gentile Fusillo+21's Gaia-SDSS spectroscopic sample (GF21xSDSS; Gentile Fusillo+21);
 - Montreal White Dwarf Database (MWDD; Dufour+17);
 - Planetary-Enriched White Dwarf Database (PEWDD; Williams+24);
 
 These datasets, containing spectral classifications of $10^3$-$10^5$ WDs, are used to label WDs as "polluted" (1), "not polluted" (0), or "unknown" (-1). "Polluted" means that at least one of the datasets identifies the WD as polluted. "Not polluted" means that at least one of the datasets identifies the WD as something else, e.g. a DA, and none of them identify it as polluted. 
 
 The datasets are obtained by, respectively:
-- GF21xSDSS: Submit the query `queries/gf21_sdss.sql`, in e.g. TOPCAT;
+- GF21xSDSS: Submit the query `queries/gf21_sdss.sql`, to e.g. TOPCAT;
 - MWDD: Visit montrealwhitedwarfdatabase.org. On the 'Tables and Charts' page, click the 'Options' button and deselect everything except 'Gaia DR3 ID' and 'Spectral type'. Click 'Export as csv'.
 - PEWDD: The dataset can be downloaded from https://github.com/jamietwilliams/PEWDD/blob/main/PEWDD.csv
 
@@ -76,24 +76,24 @@ Running the script `scripts/evaluate_existing_methods.py` outputs the numbers of
 
 ## Data selection
 
-### Obtaining WD candidate sample from GF+21
+### Obtaining WD candidate sample
 
-To obtain a good sample of WDs whose XP spectra to analyse, we use the query in `src/queries/gf21.sql` to obtain data from the catalogue of Gentile Fusillo+21 (hereafter GF+21). This query uses similar selection criteria to PC+24, but is slightly more inclusive:
+To obtain a good sample of WDs whose XP spectra to analyse, we use the query in `src/queries/gf21.sql` to obtain data from the catalogue of Gentile Fusillo+21 (hereafter GF+21). This query uses similar selection criteria to PC+24.:
 
 1. 1. `phot_bp_n_obs` >= 10  (Andrae+23)
    2. `phot_rp_n_obs` >= 15  (^)
 2. `visibility_periods_used` >= 10  (Lindegren+18)
 
-We used TOPCAT to obtain the sample, which is saved to `data/external/gf21.csv` and contains 1 070 932 rows. Most of these objects will not have XP spectra, however...
+We used TOPCAT to obtain the interim sample, which is saved to `data/interim/gf21_filtered.csv` and contains 1 070 932 rows.
 
 
 ### Obtaining XP spectra for sample
 
-We now obtain the XP spectra for those objects -- at least, the ones which _have_ XP spectra yet. Visiting https://gaia.aip.de/query/, we must first upload a VOtable. This is carried out by `scripts/make_gf21_votable.py`, which creates the file `data/interim/gf21_ids.xml`.
+We now obtain the XP spectra for the subset of those objects which actually have available spectra yet. Visiting https://gaia.aip.de/query/, we must first upload a VOtable. This is created by `scripts/make_gf21_votable.py`, which creates the file `data/interim/gf21_ids.xml`.
 
-Upload this .xml file to Gaia@AIP at the above link under 'Upload VOTable' (NB: you probably need an account), and name it gf21_ids. It should then appear in the 'Job list' panel. Copy the query in `src/queries/gaia_aip_xp.sql` into the SQL query box, making sure to replace `<username>` with your actual username. Change the Table name field to gf21_xp, and change the Queue time to 5 minutes. When I do this, it takes about 50 seconds to complete the join.
+Upload this .xml file to Gaia@AIP at the above link under 'Upload VOTable' (NB: you probably need an account), and name it gf21_filtered. It should then appear in the 'Job list' panel, and finish uploading after about a minute. Copy the query in `src/queries/gaia_aip_xp.sql` into the SQL query box, making sure to replace `<username>` with your actual username. Change the Table name field to `xp`, and change the Queue time to 5 minutes. When I do this, it takes about 50 seconds to complete the join.
 
-After the job is complete, click the Download tab and download the csv file (which may a minute or two to assemble as the table is a few GB). Save the file to `data/external/gf21_xp.csv`.
+After the job is complete, click the Download tab and download the csv file (which may a minute or two to assemble as the table is about 4GB). Save the file to `data/external/xp.csv`. It should have 107 164 rows, one for every WD candidate with available Gaia XP spectra.
 
 ### Process XP spectra
 
