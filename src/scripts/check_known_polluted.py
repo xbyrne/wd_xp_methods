@@ -99,7 +99,7 @@ def check_mwdd(id_):
             ss in cl for ss in disqualifying_substrings
         ):  # Polluted
             return 1
-        if cl == "CND":  # Not sure
+        if cl in ["CND", "D", "?"]:  # Not sure
             return -1
         # else
         return 0  # Not polluted
