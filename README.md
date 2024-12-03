@@ -98,17 +98,13 @@ After the job is complete, click the Download tab and download the csv file (whi
 ### Process XP spectra
 
 Now that we have the XP coefficients downloaded, we need to get them into a nicer form than a .csv file.
-This is achieved by the `process_xp.py` program, which creates two .npz files:
-1. `data/interim/xp_coefficients.npz`
-    - `ids` -- the Gaia EDR3 IDs
-    - `xp` -- the XP coefficients
-    - `xp_err` -- the errors on the XP coefficients
-2. `data/interim/xp_sampledspectra.npz`
-    - `ids` -- "
-    - `wlen` -- wavelengths at which the spectra are sampled
-    - `flux` -- flux in the spectrum
+This is achieved by the `process_xp.py` program, which creates `data/interim/xp_coeffs.npz`. This file contains:
+- `ids` -- the Gaia EDR3 IDs
+- `xp` -- the XP coefficients
+- `xp_err` -- the errors on the XP coefficients
 
-The latter makes use of the `GaiaXPy` package (Gaia Collaboration, Montegriffo+22).
+
+This file also contains a function (`sample_xp_spectra`) to convert the XP coefficients to ordinary, flux-vs-wavelength spectra, using the `GaiaXPy` package (Gaia Collaboration, Montegriffo+22).
 
 
 #### TODO: upload the data/external folder to zenodo when project done.
