@@ -97,12 +97,11 @@ After the job is complete, click the Download tab and download the csv file (whi
 
 ### Process XP spectra
 
-Now that we have the XP coefficients downloaded, we need to get them into a nicer form than a .csv file.
-This is achieved by the `process_xp.py` program, which creates `data/interim/xp_coeffs.npz`. This file contains:
+Now that we have the XP coefficients downloaded, we need to get them into a nicer form than a .csv file. This is achieved by the `process_xp.py` program, which creates `data/interim/xp_coeffs.npz`. This file contains:
 - `ids` -- the Gaia EDR3 IDs
 - `xp` -- the XP coefficients
 - `xp_err` -- the errors on the XP coefficients
-
+- `is_polluted` -- whether the object is identified as polluted (see 'Evaluating previous methods' above)
 
 This file also contains a function (`sample_xp_spectra`) to convert the XP coefficients to ordinary, flux-vs-wavelength spectra, using the `GaiaXPy` package (Gaia Collaboration, Montegriffo+22).
 
