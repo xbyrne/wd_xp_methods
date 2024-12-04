@@ -12,7 +12,7 @@ def divide_Gflux(xp_coeffs, ids):
     """
     Normalises the coefficients by the flux in the G band, found from GF+21
     """
-    gf21 = pd.read_csv("../data/external/gf21.csv")
+    gf21 = pd.read_csv("../data/interim/gf21_filtered.csv")
     gf21.set_index("GaiaEDR3", inplace=True)
 
     Gmag = gf21.loc[ids, "Gmag"].values
@@ -31,3 +31,17 @@ def l2_norm(xp_coeffs):
     Normalises the coefficients by the L2 norm
     """
     return xp_coeffs / np.linalg.norm(xp_coeffs, axis=1)[:, None]
+
+
+def divide_median(xp_coeffs):
+    """
+    Normalises the coefficients by the median value of each coefficient
+    """
+    return xp_coeffs / np.median(xp_coeffs, axis=1)[:, None]
+
+
+def divide_mean(xp_coeffs):
+    """
+    Normalises the coefficients by the mean value of each coefficient
+    """
+    return xp_coeffs / np.mean(xp_coeffs, axis=1)[:, None]

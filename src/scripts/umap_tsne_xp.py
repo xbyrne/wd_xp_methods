@@ -12,7 +12,7 @@ from sklearn.manifold import TSNE
 import preprocessors as pp
 
 
-def dim_reduce(data, method, preprocessor=lambda x: x, **kwargs):
+def dim_reduce(data, method, **kwargs):
     """
     Perform dimensionality reduction on the input data.
     `method` must be either 'umap' or 'tsne'.
@@ -26,7 +26,7 @@ def dim_reduce(data, method, preprocessor=lambda x: x, **kwargs):
     else:  # method == "tsne"
         reducer = TSNE(**kwargs)
 
-    return reducer.fit_transform(preprocessor(data))
+    return reducer.fit_transform(data)
 
 
 if __name__ == "__main__":
@@ -34,15 +34,15 @@ if __name__ == "__main__":
     print("Loading data...")
     fl = np.load("../data/interim/xp_coeffs.npz")
     ids = fl["ids"]
-    xp_coeffs = fl["xp"]
-    xp_coeffs = pp.divide_Gflux(xp_coeffs, ids)
+    xp = fl["xp"]
+    pxp = pp.divide_Gflux(xp, ids)  # Normalise by G-band flux
 
     print("Performing dimensionality reduction...")
     print("UMAP...")
-    umap_embedding = dim_reduce(xp_coeffs, "umap")  # ~45s
+    umap_embedding = dim_reduce(pxp, "umap")  # ~45s
 
     print("tSNE...")
-    tsne_embedding = dim_reduce(xp_coeffs, "tsne")  # ~4m
+    tsne_embedding = dim_reduce(pxp, "tsne")  # ~4m
 
     print("Saving embeddings...")
     np.savez_compressed(
