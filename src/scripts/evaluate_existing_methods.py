@@ -149,7 +149,8 @@ if __name__ == "__main__":
     # --------------------------
     # Vincent+24
     vincent24 = pd.read_csv("../data/external/previous_work/vincent24.csv", index_col=0)
-    vincent24_DZ = vincent24[vincent24["spectype"] == "DZ"]
+    vincent24["SpType"] = vincent24["SpType"].apply(lambda x: x.strip())
+    vincent24_DZ = vincent24[vincent24["SpType"] == "DZ"]
 
     is_polluted_vincent24 = pd.DataFrame(
         index=vincent24_DZ.index, columns=["is_polluted"]
