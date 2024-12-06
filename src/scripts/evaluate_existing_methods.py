@@ -104,10 +104,11 @@ def check_mwdd(id_):
     disqualifying_substrings = ["Z?", "Z:", "+", "/"]
     if id_ in mwdd_index:
         cl = mwdd.loc[id_, "spectype"]
-        if "Z" in cl and not any(
-            ss in cl for ss in disqualifying_substrings
-        ):  # Polluted
-            return 1
+        if "Z" in cl:
+            if not any(ss in cl for ss in disqualifying_substrings):  # Polluted
+                return 1
+            if "?" in cl or ":" in cl:  # Not sure, e.g. DZ?, DZ:d
+                return -1
         if cl in ["CND", "D", "?"]:  # Not sure
             return -1
         # else
