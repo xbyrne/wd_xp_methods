@@ -39,15 +39,15 @@ if __name__ == "__main__":
 
     print("Performing dimensionality reduction...")
     print("UMAP...")
-    umap_embedding = dim_reduce(pxp, "umap")  # ~45s
-
-    print("tSNE...")
-    tsne_embedding = dim_reduce(pxp, "tsne")  # ~4m
-
-    print("Saving embeddings...")
+    umap_embedding = dim_reduce(pxp, "umap", n_neighbors=25, min_dist=0.05)  # ~45s
+    print("Saving...")
     np.savez_compressed(
         "../data/processed/umap_xp.npz", ids=ids, embedding=umap_embedding
     )
+
+    print("tSNE...")
+    tsne_embedding = dim_reduce(pxp, "tsne", perplexity=50)  # ~4m
+    print("Saving...")
     np.savez_compressed(
         "../data/processed/tsne_xp.npz", ids=ids, embedding=tsne_embedding
     )
