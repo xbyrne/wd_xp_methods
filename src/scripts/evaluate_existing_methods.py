@@ -17,7 +17,7 @@ gf21sdss = pd.read_csv(
 )  # 41820 rows, from VizieR
 gf21sdss.drop_duplicates(subset="GaiaEDR3", inplace=True)  # 41820 -> 32169
 gf21sdss.set_index("GaiaEDR3", inplace=True)
-gf21sdss_index = set(gf21sdss.index.values)  # For faster checking
+gf21sdss_index = set(gf21sdss.index)  # Convert to set for faster checking
 
 # MWDD
 mwdd = pd.read_csv(
@@ -26,7 +26,7 @@ mwdd = pd.read_csv(
 mwdd.drop_duplicates(subset="gaiaedr3", inplace=True)  # 70698 -> 61198
 mwdd.dropna(inplace=True)  # 61198 -> 56745
 mwdd.set_index("gaiaedr3", inplace=True)
-mwdd_index = set(mwdd.index.values)  # For faster checking
+mwdd_index = set(mwdd.index)
 
 # PEWDD
 pewdd = pd.read_csv(
@@ -34,8 +34,8 @@ pewdd = pd.read_csv(
 )  # 3546 rows, from Github 2024-11-06
 pewdd.set_index("Gaia_designation", inplace=True)
 pewdd = pewdd[pewdd.index.fillna("").str.startswith("Gaia DR3")]  # 3546 -> 2979
-pewdd.index = pewdd.index.str.replace("Gaia DR3 ", "").astype(int)
-pewdd_index = set(pewdd.index.values)  # For faster checking
+pewdd.index = pewdd.index.str.replace("Gaia DR3 ", "")
+pewdd_index = set(pewdd.index)
 
 
 # --------------------------
@@ -102,7 +102,7 @@ def check_mwdd(id_):
     - False: classified as something else
     """
     disqualifying_substrings = ["Z?", "Z:", "+", "/"]
-    if id_ in mwdd_index:
+    if float(id_) in mwdd_index:
         cl = mwdd.loc[id_, "spectype"]
         if "Z" in cl:
             if not any(ss in cl for ss in disqualifying_substrings):  # Polluted
@@ -124,7 +124,7 @@ def check_pewdd(id_):
     - True: if the object is in the dataset
     - None: otherwise
     """
-    if id_ in pewdd_index:  # Polluted
+    if str(id_) in pewdd_index:  # Polluted
         return 1
     # else
     return -1  # Not sure - not in PEWDD
