@@ -3,7 +3,7 @@
 -- We used TOPCAT to post the query and download the results
 -- The resulting table should be saved to `src/data/interim/gf21_filtered.csv`
 
-SELECT GaiaEDR3, "Gmag", BPmag, RPmag, RA_ICRS, DE_ICRS, Plx, Pwd, TeffH, SDSS12
+SELECT GaiaEDR3, "Gmag", BPmag, RPmag, Plx, Pwd, TeffH
 FROM "J/MNRAS/508/3877/maincat"
 WHERE
     o_BPmag >= 10 AND -- phot_bp_n_obs (Andrae+23)
