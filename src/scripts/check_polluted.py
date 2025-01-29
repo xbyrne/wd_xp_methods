@@ -1,8 +1,7 @@
 """
-evaluate_existing_methods.py
+check_pollution.py
 ============================
-Evaluates the methods of Garcia-Zamora+23, Vincent+24, and Kao+24 (if available)
-in selecting polluted WDs.
+Functionality to check whether a given WD is known to be polluted.
 """
 
 import numpy as np
@@ -40,7 +39,7 @@ pewdd_index = set(pewdd.index)
 
 # --------------------------
 # Functions to check whether a given WD is known to be polluted
-def check_whether_obj_polluted(id_):
+def is_polluted(id_):
     """
     Checks whether a WD with a given Gaia EDR3 ID is polluted.
     Checks GF21xSDSS, PEWDD, and MWDD, and decides based on those.
@@ -128,62 +127,3 @@ def check_pewdd(id_):
         return 1
     # else
     return -1  # Not sure - not in PEWDD
-
-
-# if __name__ == "__main__":
-#     # --------------------------
-#     # Garcia-Zamora+23
-#     gz23 = pd.read_csv("../data/external/previous_work/garciazamora23.csv", index_col=0)
-#     gz23_DxZ = gz23.query("SPPred.str.contains('Z')")  # DZ, DAZ, DBZA...
-
-#     is_polluted_gz23 = pd.DataFrame(index=gz23_DxZ.index, columns=["is_polluted"])
-#     isp_gz23 = np.zeros_like(gz23_DxZ.index, dtype=int)
-
-#     for i, idd in enumerate(gz23_DxZ.index):
-#         isp_gz23[i] = check_whether_obj_polluted(idd)
-#     is_polluted_gz23["is_polluted"] = isp_gz23
-
-#     print("Garcia-Zamora+23:")
-#     print(is_polluted_gz23["is_polluted"].value_counts())
-#     print("\n")
-
-#     # --------------------------
-#     # Vincent+24
-#     vincent24 = pd.read_csv("../data/external/previous_work/vincent24.csv", index_col=0)
-#     vincent24["SpType"] = vincent24["SpType"].apply(lambda x: x.strip())
-#     vincent24_DZ = vincent24[vincent24["SpType"] == "DZ"]
-
-#     is_polluted_vincent24 = pd.DataFrame(
-#         index=vincent24_DZ.index, columns=["is_polluted"]
-#     )
-#     isp_vincent24 = np.zeros_like(vincent24_DZ.index, dtype=int)
-
-#     for i, idd in enumerate(vincent24_DZ.index):
-#         isp_vincent24[i] = check_whether_obj_polluted(idd)
-#     is_polluted_vincent24["is_polluted"] = isp_vincent24
-#     print("Vincent+24:")
-#     print(is_polluted_vincent24["is_polluted"].value_counts())
-#     print("\n")
-
-#     # --------------------------
-#     # Kao+24, if available
-#     try:
-#         kao24_cool_DZs = pd.read_csv(
-#             "../data/external/previous_work/secret/umap_polluted_all.csv", index_col=1
-#         )
-#     except FileNotFoundError:
-#         kao24_cool_DZs = None
-
-#     if kao24_cool_DZs is not None:
-#         is_polluted_kao24 = pd.DataFrame(
-#             index=kao24_cool_DZs.index, columns=["is_polluted"]
-#         )
-
-#         isp_kao24 = np.zeros_like(kao24_cool_DZs.index, dtype=int)
-#         for i, idd in enumerate(kao24_cool_DZs.index):
-#             isp_kao24[i] = check_whether_obj_polluted(idd)
-#         is_polluted_kao24["is_polluted"] = isp_kao24
-
-#         print("Kao+24:")
-#         print(is_polluted_kao24["is_polluted"].value_counts())
-#         print("\n")

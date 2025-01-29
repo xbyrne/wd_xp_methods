@@ -13,8 +13,6 @@ import numpy as np
 import pandas as pd
 from gaiaxpy import calibrate
 
-from evaluate_existing_methods import check_whether_obj_polluted
-
 
 def read_xp_to_arrays(filename):
     """
@@ -78,12 +76,19 @@ if __name__ == "__main__":
 
     print("Extracting XP coefficients...")
     ids, xp, xp_err = read_xp_to_arrays(XP_FILE)
-    print("Checking whether the objects have been identified as polluted...")
-    is_polluted = np.array([check_whether_obj_polluted(id_) for id_ in ids])
     np.savez_compressed(
         "../data/interim/xp_coeffs.npz",
         ids=ids,
         xp=xp,
         xp_err=xp_err,
-        is_polluted=is_polluted,
     )
+
+    # print("Sampling XP spectra...")
+    # ids, fluxes, flux_errs = sample_xp_spectra(XP_FILE)
+    # np.savez_compressed(
+    #     "../data/interim/xp_spectra.npz",
+    #     ids=ids,
+    #     wlen=WLEN_GRID,
+    #     fluxes=fluxes,
+    #     flux_errs=flux_errs,
+    # )

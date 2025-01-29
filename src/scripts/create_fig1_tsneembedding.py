@@ -9,6 +9,8 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 from sklearn.cluster import DBSCAN
 
+import check_polluted as cp
+
 fl = np.load("../data/processed/tsne_xp.npz")
 ids = fl["ids"]
 tsne_embedding = fl["embedding"]
@@ -16,7 +18,7 @@ tsne_embedding = fl["embedding"]
 fl = np.load("../data/processed/umap_xp.npz")
 umap_embedding = fl["embedding"]
 
-isp = np.load("../data/interim/xp_coeffs.npz")["is_polluted"]
+isp = np.array([cp.is_polluted(id_) for id_ in ids])
 
 dbscan = DBSCAN(eps=2, min_samples=30)
 dbscan.fit(tsne_embedding)
@@ -92,7 +94,7 @@ cbar = plt.colorbar(
 )
 cbar.set_ticks(np.linspace(1 / len(cols) / 2, 1 - 1 / len(cols) / 2, len(cols)))
 cbar.set_ticklabels(np.unique(dbscan.labels_), fontsize=12)
-cbar.set_label(r"$t$SNE cluster label", fontsize=14)
+cbar.set_label(r"DBSCAN cluster label on $t$SNE embedding", fontsize=14)
 
 ax = axs["umap"]
 for i in np.unique(dbscan.labels_):
@@ -115,4 +117,4 @@ for i, ax in enumerate(axs.values()):
         ax.text(0.025, 0.92, f"({chr(97+i)})", fontsize=16, transform=ax.transAxes)
 
 
-fg.savefig("../tex/figures/fig2_tsneembedding.png", bbox_inches="tight", dpi=300)
+fg.savefig("../tex/figures/fig1_tsneembedding.png", bbox_inches="tight", dpi=300)
