@@ -1,3 +1,6 @@
 gf21_filtered.csv
 gf21_filtered_ids.xml
+gf21_filtered_moredata.csv
+
 xp_coeffs.npz
+xp_sampled.npz

@@ -1,2 +1,3 @@
 *.ipynb
 __pycache__/*
+xp_spectra_pngs/*

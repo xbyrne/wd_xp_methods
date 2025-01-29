@@ -1,50 +1,65 @@
 # wd_xp_methods
 A comparison of different methods for analysing Gaia XP spectra of white dwarfs, particularly to find polluted WDs
 
+## Data Collection
 
-## Plan
+### Obtaining WD candidate sample
 
-1. Assemble dataset from GF+21 [x]
+To obtain a good sample of WDs whose XP spectra to analyse, we use the query in `src/queries/gf21.sql` to obtain data from the catalogue of Gentile Fusillo+21 (hereafter GF+21). This query uses similar selection criteria to Pérez-Couto+24 (PC+24):
 
-2. Obtain the XP spectra for this sample from Gaia@AIP [x]
+1. 1. `phot_bp_n_obs` >= 10  (Andrae+23)
+   2. `phot_rp_n_obs` >= 15  (ibid.)
+2. `visibility_periods_used` >= 10  (Lindegren+18)
 
-3. Apply / reproduce methods []
+We used TOPCAT to obtain the interim sample, which is saved to `data/interim/gf21_filtered.csv` and contains 1 070 932 rows.
 
-    1. UMAP (Kao+24) [x]
-    2. tSNE [x]
-    3. Contrastive Learning []
-        1. Work out noising -- do we really want to resample using the errors from 10^5 objects? Are there any alternatives?
-    4. SOMs (PC+24) []
-        1. Ask PC whether they tried just using one SOM?
-        2. Any advice for hyperparameter optimisation?
-    5. Standard ML (Vincent+24) []
-        1. Grab his network somehow?
-        2. Reproduce?
+#### Obtaining XP spectra
 
+We now obtain the XP spectra for the subset of those objects which actually have available XP spectra yet. Visiting https://gaia.aip.de/query/, we must first upload a VOtable. This is created by `scripts/make_gf21_votable.py`, which creates the file `data/interim/gf21_ids.xml`.
 
-## Evaluating previous methods against available datasets
+Upload this .xml file to Gaia@AIP at the above link under 'Upload VOTable' (NB: you probably need an account), and name it gf21_filtered. It should then appear in the 'Job list' panel, and finish uploading after about a minute. Copy the query in `src/queries/gaia_aip_xp.sql` into the SQL query box, making sure to replace `<username>` with your actual username. Change the Table name field to `xp`, and change the Queue time to 5 minutes. When I do this, it takes about 50 seconds to complete the join.
 
-We first evaluate the results of others' attempts to select polluted WDs from Gaia XP spectra, by comparing them to datasets of spectroscopically-confirmed polluted WDs.
+After the job is complete, click the Download tab and download the csv file (which may a minute or two to assemble as the table is about 4GB). Save the file to `data/external/xp.csv`. It should have 107 164 rows, one for every WD candidate with available Gaia XP spectra.
+
+Now that we have the XP coefficients downloaded, we need to get them into a nicer form than a .csv file. This is achieved by the `process_xp.py` program, which creates `data/interim/xp_coeffs.npz`. This file contains:
+- `ids` -- the Gaia EDR3 IDs
+- `xp` -- the XP coefficients
+- `xp_err` -- the errors on the XP coefficients
+<!-- - `is_polluted` -- whether the object is identified as polluted (see 'Evaluating previous methods' above) -->
+
+This file also contains a function (`sample_xp_spectra`) to convert the XP coefficients to ordinary, flux-vs-wavelength spectra, using the `GaiaXPy` package (Gaia Collaboration, Montegriffo+22).
+
 
 ### Getting datasets for pollution labelling
 
-We use three datasets to label the pollution of WDs. These are:
-- Gentile Fusillo+21's Gaia-SDSS spectroscopic sample (GF21xSDSS; Gentile Fusillo+21);
+We use three datasets to label our knowledge of the pollution of WDs. These are:
+- GF+21's Gaia-SDSS spectroscopic sample (Gaia+SDSS; GF+21);
 - Montreal White Dwarf Database (MWDD; Dufour+17);
 - Planetary-Enriched White Dwarf Database (PEWDD; Williams+24);
 
-These datasets, containing spectral classifications of $10^3$-$10^5$ WDs, are used to label WDs as "polluted" (1), "not polluted" (0), or "unknown" (-1). "Polluted" means that at least one of the datasets identifies the WD as polluted. "Not polluted" means that at least one of the datasets identifies the WD as something else, e.g. a DA, and none of them identify it as polluted. 
+These datasets, containing spectral classifications of $10^3$-$10^5$ WDs, are used to label WDs as "known polluted" (1), "known non-polluted" (0), or "unknown" (-1). "Known polluted" means that at least one of the datasets identifies the WD as polluted. "Known non-polluted" means that at least one of the datasets identifies the WD as something else, e.g. a DA, and none of them identify it as polluted. "Unknown" means that the WD is not in any of the above datasets
 
 The datasets are obtained by, respectively:
 - GF21xSDSS: Submit the query `queries/gf21_sdss.sql`, to e.g. TOPCAT;
-- MWDD: Visit montrealwhitedwarfdatabase.org. On the 'Tables and Charts' page, click the 'Options' button and deselect everything except 'Gaia DR3 ID' and 'Spectral type'. Click 'Export as csv'.
-- PEWDD: The dataset can be downloaded from https://github.com/jamietwilliams/PEWDD/blob/main/PEWDD.csv
+- MWDD: Visit montrealwhitedwarfdatabase.org. On the 'Tables and Charts' page, click the 'Options' button and deselect everything except 'Gaia DR3 ID' and 'Spectral type'. Click 'Export as csv'. Last accessed 2024-11-06.
+- PEWDD: The dataset can be downloaded from https://github.com/jamietwilliams/PEWDD/blob/main/PEWDD.csv . Last accessed 2024-11-06.
 
 The datasets are stored in `data/external/evaluation` as `gf21_sdss.csv`, `mwdd.csv`, and `pewdd.csv`.
 
 GF21xSDSS is a stable VizieR catalogue (J/MNRAS/508/3877/sdssspec), but the other two catalogues are actively updated. For reproducibility, these are saved here as they were on Nov 6 2024.
 
-### Datasets produced in previous work
+
+## Applying $t$SNE 
+
+The program `scripts/umap_tsne_xp.py` runs UMAP and tSNE on the sample's XP spectra. A couple of data normalisation methods are found in the `scripts/preprocessors.py` file, including normalising by the G flux (as in Kao+24) or by the L2 norm (as in PC+24). The results don't seem to be affected very strongly by the normalisation chosen; we use the G flux normalisation in our work.
+
+The UMAP and tSNE embeddings of the XP spectra can be found in `data/processed/umap_xp.npz` and `tsne_xp.npz`. The program `scripts/create_fig1_tsneembedding.py` creates a plot showing some interesting features and comparisons between these embeddings.
+
+
+
+
+
+<!-- ### Datasets produced in previous work
 
 The classifications of García-Zamora+23 and Vincent+24 are, commendably, available online at the VizieR catalogues 'J/A+A/679/A127/catalog' and 'J/A+A/682/A5/catalog' respectively. The queries
 ```sql
@@ -71,51 +86,12 @@ NB: It is possible that some WDs labelled as not polluted are, in fact, polluted
 
 The details of how these cases are ascertained (e.g. which classifications are included) are given in the docstrings of the `check_{dataset}` functions.
 
-Running the script `scripts/evaluate_existing_methods.py` outputs the numbers of polluted/non-polluted/unknown WDs claimed by each of the previous works to be polluted. The program still runs if the Kao+24 selection is not available.
+Running the script `scripts/evaluate_existing_methods.py` outputs the numbers of polluted/non-polluted/unknown WDs claimed by each of the previous works to be polluted. The program still runs if the Kao+24 selection is not available. -->
 
 
-## Data selection
 
-### Obtaining WD candidate sample
+# TODO: upload the data/external folder to zenodo when project done.
 
-To obtain a good sample of WDs whose XP spectra to analyse, we use the query in `src/queries/gf21.sql` to obtain data from the catalogue of Gentile Fusillo+21 (hereafter GF+21). This query uses similar selection criteria to PC+24.:
-
-1. 1. `phot_bp_n_obs` >= 10  (Andrae+23)
-   2. `phot_rp_n_obs` >= 15  (^)
-2. `visibility_periods_used` >= 10  (Lindegren+18)
-
-We used TOPCAT to obtain the interim sample, which is saved to `data/interim/gf21_filtered.csv` and contains 1 070 932 rows.
-
-
-### Obtaining XP spectra for sample
-
-We now obtain the XP spectra for the subset of those objects which actually have available spectra yet. Visiting https://gaia.aip.de/query/, we must first upload a VOtable. This is created by `scripts/make_gf21_votable.py`, which creates the file `data/interim/gf21_ids.xml`.
-
-Upload this .xml file to Gaia@AIP at the above link under 'Upload VOTable' (NB: you probably need an account), and name it gf21_filtered. It should then appear in the 'Job list' panel, and finish uploading after about a minute. Copy the query in `src/queries/gaia_aip_xp.sql` into the SQL query box, making sure to replace `<username>` with your actual username. Change the Table name field to `xp`, and change the Queue time to 5 minutes. When I do this, it takes about 50 seconds to complete the join.
-
-After the job is complete, click the Download tab and download the csv file (which may a minute or two to assemble as the table is about 4GB). Save the file to `data/external/xp.csv`. It should have 107 164 rows, one for every WD candidate with available Gaia XP spectra.
-
-### Process XP spectra
-
-Now that we have the XP coefficients downloaded, we need to get them into a nicer form than a .csv file. This is achieved by the `process_xp.py` program, which creates `data/interim/xp_coeffs.npz`. This file contains:
-- `ids` -- the Gaia EDR3 IDs
-- `xp` -- the XP coefficients
-- `xp_err` -- the errors on the XP coefficients
-- `is_polluted` -- whether the object is identified as polluted (see 'Evaluating previous methods' above)
-
-This file also contains a function (`sample_xp_spectra`) to convert the XP coefficients to ordinary, flux-vs-wavelength spectra, using the `GaiaXPy` package (Gaia Collaboration, Montegriffo+22).
-
-
-#### TODO: upload the data/external folder to zenodo when project done.
-
-
-## Applying methods
-
-### UMAP & tSNE
-
-The program `scripts/umap_tsne_xp.py` runs UMAP and tSNE on the sample's XP spectra. A couple of data normalisation methods are found in the `scripts/preprocessors.py` file, including normalising by the G flux (as in Kao+24) or by the L2 norm (as in PC+24). The results don't seem to be affected very strongly by the normalisation chosen.
-
-The UMAP and tSNE embeddings of the XP spectra an be found in `data/processed/umap_xp.npz` and `tsne_xp.npz`.
 
 
 ## References
