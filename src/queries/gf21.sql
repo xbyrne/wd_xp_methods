@@ -7,5 +7,5 @@ SELECT GaiaEDR3, "Gmag", BPmag, RPmag, Plx, Pwd, TeffH
 FROM "J/MNRAS/508/3877/maincat"
 WHERE
     o_BPmag >= 10 AND -- phot_bp_n_obs (Andrae+23)
-    o_RPmag >= 15 AND -- phot_rp_n_obs (")
+    o_RPmag >= 15 AND -- phot_rp_n_obs (ibid.)
     Nper >= 10        -- visibility_periods_used (Lindegren+18)
