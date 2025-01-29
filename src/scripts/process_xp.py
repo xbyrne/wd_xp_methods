@@ -83,12 +83,12 @@ if __name__ == "__main__":
         xp_err=xp_err,
     )
 
-    # print("Sampling XP spectra...")
-    # ids, fluxes, flux_errs = sample_xp_spectra(XP_FILE)
-    # np.savez_compressed(
-    #     "../data/interim/xp_spectra.npz",
-    #     ids=ids,
-    #     wlen=WLEN_GRID,
-    #     fluxes=fluxes,
-    #     flux_errs=flux_errs,
-    # )
+    print("Sampling XP spectra...")
+    ids, fluxes, flux_errs = sample_xp_spectra(XP_FILE)
+    np.savez_compressed(
+        "../data/interim/xp_spectra.npz",
+        ids=ids,
+        wlen=WLEN_GRID,
+        fluxes=fluxes,
+        flux_errs=flux_errs,
+    )
