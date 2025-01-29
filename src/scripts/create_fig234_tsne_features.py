@@ -1,5 +1,5 @@
 """
-create_figs234_tsnefeatures.py
+create_fig234_tsnefeatures.py
 ==============================
 Creates further figures, identifying interesting features
 in the tSNE embedding
