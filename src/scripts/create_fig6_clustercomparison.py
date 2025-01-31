@@ -50,44 +50,36 @@ cluster6_TeffH = gf21.loc[cluster6_ids, "TeffH"]
 # =============================================================================
 # Plot
 
-fg, axs = plt.subplots(2, 2, figsize=(12, 6), gridspec_kw={"hspace": 0, "wspace": 0.05})
+fg, axs = plt.subplots(1, 2, figsize=(12, 4), gridspec_kw={"wspace": 0.05})
 
 # Median spectra
 
-axs[0, 0].plot(wlen, np.median(cluster4_flux, axis=0), "orange", lw=2)
-axs[1, 0].plot(wlen, np.median(cluster6_flux, axis=0), "r", lw=2)
+ax = axs[0]
+ax.plot(wlen, np.median(cluster4_flux, axis=0), "orange", lw=2, label="Cluster #4")
+ax.plot(wlen, np.median(cluster6_flux, axis=0), "r", lw=2, label="Cluster #6")
 
-for ax in axs[:, 0]:
-    ax.set_xlim(350, 700)
-    ax.axvline(393.366, c="k", ls="--")
-    ax.axvline(396.847, c="k", ls="--", label="Ca II H&K")
+ax.axvline(393.366, c="k", ls="--")
+ax.axvline(396.847, c="k", ls="--", label="Ca II H&K")
+
+ax.set_xlabel("Wavelength [nm]", fontsize=14)
+ax.set_ylabel("Flux [arbitrary]", fontsize=14, x=0.1, y=0.5)
+ax.set_title("Median spectra", fontsize=17)
+ax.set_xlim(350, 700)
+ax.legend(fontsize=14)
 
 # Temperature distributions
 
 BINS = np.arange(5.5, 13, 0.5)
-axs[0, 1].hist(cluster4_TeffH / 1e3, bins=BINS, density=True, color="orange")
-axs[1, 1].hist(cluster6_TeffH / 1e3, bins=BINS, density=True, color="r")
+ax = axs[1]
+ax.hist(cluster4_TeffH / 1e3, bins=BINS, density=True, color="orange", alpha=0.6)
+ax.hist(cluster6_TeffH / 1e3, bins=BINS, density=True, color="r", alpha=0.6)
 
-for ax in axs[:, 1]:
-    ax.set_xlim(5.2, 12.8)
+ax.set_xlabel(r"$T_{\rm eff}$ [$10^3\,\text{K}$]", fontsize=14)
+ax.set_title(r"$T_{\rm eff}$ distributions", fontsize=17)
+ax.set_xlim(5.2, 12.8)
 
-# Aesthetics
 
-for ax in axs[0, :]:
-    ax.set_xticklabels([])
-
-fg.supylabel("Flux [arbitrary]", fontsize=14, x=0.1, y=0.5)
-axs[1, 0].set_xlabel("Wavelength [nm]", fontsize=14)
-axs[1, 1].set_xlabel(r"$T_{\rm eff}$ [$10^3\,\text{K}$]", fontsize=14)
-
-axs[0, 0].set_ylabel("Cluster #4", fontsize=17, labelpad=40)
-axs[1, 0].set_ylabel("Cluster #6", fontsize=17, labelpad=40)
-axs[0, 0].set_title("Median spectra", fontsize=17, y=1.05)
-axs[0, 1].set_title(r"$T_{\rm eff}$ distributions", fontsize=17, y=1.05)
-
-axs[1, 0].legend(fontsize=14)
-
-for ax in axs.flatten():
+for ax in axs:
     ax.set_yticks([])
     ax.tick_params(
         axis="both",
