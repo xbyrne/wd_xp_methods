@@ -9,6 +9,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.cluster import DBSCAN
 
+import preprocessors as pp
+
 # =============================================================================
 # Load the data
 
@@ -22,6 +24,9 @@ fl = np.load("../data/interim/xp_sampled.npz")
 assert (fl["ids"] == ids).all()  # No need to reload
 wlen = fl["wlen"]
 flux = fl["flux"]
+
+# Normalising
+pflux = pp.divide_Gflux(flux, ids)
 
 # Temperature data
 gf21 = pd.read_csv("../data/interim/gf21_filtered.csv", index_col=0)
@@ -42,8 +47,8 @@ labels = dbscan_label(tsne_embedding, eps=2, min_samples=30)
 
 cluster4_ids = ids[labels == 4]
 cluster6_ids = ids[labels == 6]
-cluster4_flux = flux[np.isin(ids, cluster4_ids)]
-cluster6_flux = flux[np.isin(ids, cluster6_ids)]
+cluster4_flux = pflux[np.isin(ids, cluster4_ids)]
+cluster6_flux = pflux[np.isin(ids, cluster6_ids)]
 cluster4_TeffH = gf21.loc[cluster4_ids, "TeffH"]
 cluster6_TeffH = gf21.loc[cluster6_ids, "TeffH"]
 
