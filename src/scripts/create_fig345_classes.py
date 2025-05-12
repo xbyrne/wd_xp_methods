@@ -5,11 +5,10 @@ Creates further figures, identifying interesting features
 in the tSNE embedding
 """
 
+import check_polluted as cp
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-
-import check_polluted as cp
 
 # =============================================================================
 # Load data
@@ -37,7 +36,7 @@ DA_BPRPs = (DA_mags["BPmag"] - DA_mags["RPmag"]).values  # (7 423,)
 # -----------------------------------------------------------------------------
 # Plot
 
-fg, ax = plt.subplots(figsize=(6, 5))
+fg, ax = plt.subplots(figsize=(5.5, 5.5))
 ax.scatter(embedding[:, 0], embedding[:, 1], c="k", s=0.1, alpha=0.1)
 
 is_DA = np.isin(ids, DA_ids_in_sample)  # (107 164,), 7 423 True
@@ -45,14 +44,16 @@ DAsc = ax.scatter(
     embedding[is_DA, 0], embedding[is_DA, 1], c=DA_BPRPs, cmap="inferno_r", s=4
 )
 
-cbar = plt.colorbar(DAsc, ax=ax, pad=0)
-cbar.set_label(r"BP $ - $ RP", fontsize=14, labelpad=0)
+cbar = plt.colorbar(DAsc, ax=ax, pad=0, location="bottom")
+cbar.set_label(r"$\mathit{BP} - \mathit{RP}$", fontsize=14)
+cbar.ax.set_xticks([-0.5, 0, 0.5, 1])
+cbar.ax.tick_params(labelsize=12)
 
 ax.set_xticks([])
 ax.set_yticks([])
 
 fg.tight_layout()
-fg.savefig("../tex/figures/fig2_DAsequence.png", dpi=300, bbox_inches="tight")
+fg.savefig("../tex/figures/fig3_DAsequence.png", dpi=300, bbox_inches="tight")
 
 # =============================================================================
 # Fig 3: DBs, DCs, DQs
@@ -81,7 +82,7 @@ DB_MARKER = "^"
 DC_MARKER = "o"
 DQ_MARKER = "D"
 
-fg, ax = plt.subplots(figsize=(6, 6))
+fg, ax = plt.subplots(figsize=(5.5, 5.5))
 
 ax.scatter(embedding[:, 0], embedding[:, 1], c="k", s=0.1, alpha=0.1)
 
@@ -121,7 +122,7 @@ ax.legend(
     fontsize=12,
 )
 
-fg.savefig("../tex/figures/fig3_DBCQ.png", dpi=300, bbox_inches="tight")
+fg.savefig("../tex/figures/fig4_DBCQ.png", dpi=300, bbox_inches="tight")
 
 # =============================================================================
 # Fig 4: MS stars and binaries
@@ -143,7 +144,7 @@ STAR_MARKER = "*"
 BINARY_MARKER = "*"
 CV_MARKER = "x"
 
-fg, ax = plt.subplots(figsize=(6, 6))
+fg, ax = plt.subplots(figsize=(5.5, 5.5))
 ax.scatter(embedding[:, 0], embedding[:, 1], c="k", s=0.1, alpha=0.1)
 
 ax.scatter(
@@ -183,4 +184,4 @@ ax.legend(
     loc="upper left",
 )
 
-fg.savefig("../tex/figures/fig4_ms.png", dpi=300, bbox_inches="tight")
+fg.savefig("../tex/figures/fig5_ms.png", dpi=300, bbox_inches="tight")

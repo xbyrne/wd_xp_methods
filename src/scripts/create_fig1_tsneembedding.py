@@ -4,117 +4,76 @@ create_fig2_tsneembedding.py
 Script to visualise the tSNE embedding of the Gaia XP spectra
 """
 
-import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.colors as mcolors
-from sklearn.cluster import DBSCAN
-
 import check_polluted as cp
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+import numpy as np
 
 fl = np.load("../data/processed/tsne_xp.npz")
 ids = fl["ids"]
 tsne_embedding = fl["embedding"]
 
-fl = np.load("../data/processed/umap_xp.npz")
-umap_embedding = fl["embedding"]
-
 isp = np.array([cp.is_polluted(id_) for id_ in ids])
 
-dbscan = DBSCAN(eps=2, min_samples=30)
-dbscan.fit(tsne_embedding)
 
-fg, axs = plt.subplot_mosaic(
-    [["tsne_unlabelled", "tsne_isp"], ["tsne_clustered", "umap"], ["cbar", "cbar"]],
-    figsize=(10, 10),
-    gridspec_kw={"wspace": 0, "height_ratios": [1, 1, 0.05], "hspace": 0},
+fg, ax = plt.subplots(
+    figsize=(6, 6),
+    gridspec_kw={"wspace": 0, "hspace": 0},
 )
 
-axs["tsne_unlabelled"].scatter(
-    tsne_embedding[:, 0], tsne_embedding[:, 1], c="k", s=0.1, alpha=0.5
-)
-
-ax = axs["tsne_isp"]
-# Known polluted
+# Unknown
 ax.scatter(
     tsne_embedding[isp == -1, 0],
     tsne_embedding[isp == -1, 1],
     c="k",
     s=1,
-    alpha=0.1,
+    alpha=0.05,
 )
 # Known non-polluted
 ax.scatter(
     tsne_embedding[isp == 0, 0],
     tsne_embedding[isp == 0, 1],
-    c="b",
+    c="r",
     s=1,
     alpha=0.1,
 )
-# Unknown
+# Known polluted
 ax.scatter(
     tsne_embedding[isp == 1, 0],
     tsne_embedding[isp == 1, 1],
-    c="r",
+    c="g",
     s=1,
 )
-ax.scatter([], [], c="r", s=20, label="KP")
-ax.scatter([], [], c="b", s=20, alpha=0.5, label="KNP")
-ax.scatter([], [], c="k", s=20, alpha=0.5, label="U")
-ax.legend(loc="lower left", fontsize=12)
 
-ax = axs["tsne_clustered"]
-dcmp = plt.cm.viridis
-cols = [
-    dcmp(0),
-    dcmp(0.1),
-    dcmp(0.2),
-    dcmp(0.3),
-    "orange",
-    dcmp(0.4),
-    "r",
-    dcmp(0.5),
-    dcmp(0.6),
-    dcmp(0.7),
-    dcmp(0.8),
-    "grey",
-]
+# Highlighting polluted islands
+ellipse = mpl.patches.Ellipse((37, -12), 24, 16, color="k", fill=False, lw=2)
+ax.add_artist(ellipse)
+ellipse = mpl.patches.Ellipse((-4, -39), 18, 12, color="k", fill=False, lw=2)
+ax.add_artist(ellipse)
+ax.annotate("Polluted islands", xy=(20, -63), fontsize=14)
 
-for i in np.unique(dbscan.labels_):
-    ax.scatter(
-        tsne_embedding[dbscan.labels_ == i, 0],
-        tsne_embedding[dbscan.labels_ == i, 1],
-        color=cols[i],
-        s=0.1,
-        alpha=0.5,
+for x1, y1, dx, dy in [
+    (23, -55, -15, 10),
+    (37, -55, 0, 29),
+]:
+    ax.arrow(
+        x1,
+        y1,
+        dx,
+        dy,
+        color="k",
+        alpha=1,
+        lw=4,
+        head_width=3,
+        head_length=2,
     )
 
-cmap = mcolors.ListedColormap([cols[-1]] + cols[:-1])
-cbar = plt.colorbar(
-    plt.cm.ScalarMappable(cmap=cmap), cax=axs["cbar"], orientation="horizontal"
-)
-cbar.set_ticks(np.linspace(1 / len(cols) / 2, 1 - 1 / len(cols) / 2, len(cols)))
-cbar.set_ticklabels(np.unique(dbscan.labels_), fontsize=12)
-cbar.set_label(r"DBSCAN cluster label on $t$SNE embedding", fontsize=14)
+# Legend
+ax.scatter([], [], c="g", s=20, label="Known polluted")
+ax.scatter([], [], c="r", s=20, alpha=0.5, label="Known non-polluted")
+ax.scatter([], [], c="k", s=20, alpha=0.5, label="Unknown")
+ax.legend(loc="upper left", fontsize=12)
 
-ax = axs["umap"]
-for i in np.unique(dbscan.labels_):
-    ax.scatter(
-        umap_embedding[dbscan.labels_ == i, 0],
-        umap_embedding[dbscan.labels_ == i, 1],
-        color=cols[i],
-        s=0.1,
-        alpha=0.5,
-    )
-
-for ax in axs.values():
-    if ax != axs["cbar"]:
-        ax.set_xticks([])
-        ax.set_yticks([])
-
-# (a), (b), (c), (d)
-for i, ax in enumerate(axs.values()):
-    if ax != axs["cbar"]:
-        ax.text(0.025, 0.92, f"({chr(97+i)})", fontsize=16, transform=ax.transAxes)
-
-
+ax.set_xticks([])
+ax.set_yticks([])
 fg.savefig("../tex/figures/fig1_tsneembedding.png", bbox_inches="tight", dpi=300)

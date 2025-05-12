@@ -1,1 +1,16 @@
+*/__pycache__/*
 bin/*
+
+*.ipynb
+*.png
+
+*.npz
+*.xml
+*.csv
+# Except some mutable datasets that we want to preserve for reproducibility
+!data/external/evaluation/mwdd.csv
+!data/external/evaluation/pewdd.csv
+
+# Proprietary data
+data/external/previous_work/secret/*
+scripts/reproduce_perezcouto24.py
