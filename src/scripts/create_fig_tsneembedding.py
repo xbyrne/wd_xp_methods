@@ -1,13 +1,17 @@
 """
-create_fig2_tsneembedding.py
+create_fig_tsneembedding.py
 ===========================
-Script to visualise the tSNE embedding of the Gaia XP spectra
+Script to visualise the tSNE embedding of the Gaia XP spectra.
 """
+
+import sys
 
 import check_polluted as cp
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
+
+FIGURE_NUMBER = int(sys.argv[1])
 
 fl = np.load("../data/processed/tsne_xp.npz")
 ids = fl["ids"]
@@ -76,4 +80,6 @@ ax.legend(loc="upper left", fontsize=12)
 
 ax.set_xticks([])
 ax.set_yticks([])
-fg.savefig("../tex/figures/fig1_tsneembedding.png", bbox_inches="tight", dpi=300)
+fg.savefig(
+    f"../tex/figures/fig{FIGURE_NUMBER}_tsneembedding.png", bbox_inches="tight", dpi=300
+)

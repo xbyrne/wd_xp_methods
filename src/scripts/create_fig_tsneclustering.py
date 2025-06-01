@@ -1,13 +1,17 @@
 """
-create_fig2_tsneembedding.py
+create_fig_tsneclustering.py
 ===========================
-Script to visualise the tSNE embedding of the Gaia XP spectra
+Script to visualise the clustering in the tSNE embedding.
 """
+
+import sys
 
 import matplotlib.colors as mcolors
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.cluster import DBSCAN
+
+FIGURE_NUMBER = int(sys.argv[1])
 
 fl = np.load("../data/processed/tsne_xp.npz")
 ids = fl["ids"]
@@ -82,4 +86,8 @@ for i, ax in enumerate(axs.values()):
         ax.text(0.025, 0.92, f"({chr(97 + i)})", fontsize=16, transform=ax.transAxes)
 
 
-fg.savefig("../tex/figures/fig2_tsneclustering.png", bbox_inches="tight", dpi=300)
+fg.savefig(
+    f"../tex/figures/fig{FIGURE_NUMBER}_tsneclustering.png",
+    bbox_inches="tight",
+    dpi=300,
+)

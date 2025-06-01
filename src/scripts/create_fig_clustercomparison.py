@@ -1,12 +1,16 @@
 """
-create_fig8_clustercomparison.py
+create_fig_clustercomparison.py
 ================================
-Compares the effective temperatures of the two DZ clusters identified
+Compares the effective temperatures of the two DZ clusters identified.
 """
+
+import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+
+FIGURE_NUMBER = int(sys.argv[1])
 
 # Loading data
 gf21 = pd.read_csv("../data/interim/gf21_filtered_moredata.csv", index_col=0)
@@ -37,4 +41,8 @@ ax.set_xlabel(r"Fitted $T_\mathrm{eff}$ [$10^3~\text{K}$]", fontsize=14)
 ax.set_yticks([])
 ax.legend(fontsize=12)
 
-fg.savefig("../tex/figures/fig8_clustercomparison.png", dpi=300, bbox_inches="tight")
+fg.savefig(
+    f"../tex/figures/fig{FIGURE_NUMBER}_clustercomparison.png",
+    dpi=300,
+    bbox_inches="tight",
+)

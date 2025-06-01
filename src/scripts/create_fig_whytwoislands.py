@@ -1,11 +1,15 @@
 """
-create_fig7_whytwoislands.py
+create_fig_whytwoislands.py
 ============================
 Plot a figure attempting to explain why the two islands are split.
 """
 
+import sys
+
 import matplotlib.pyplot as plt
 import numpy as np
+
+FIGURE_NUMBER = int(sys.argv[1])
 
 # Load data
 fl = np.load("../data/processed/polluted_islands.npz")
@@ -60,4 +64,6 @@ fg.suptitle(
     r"$t$SNE(polluted candidates and a fraction $f$ of other sources)", fontsize=16
 )
 
-fg.savefig("../tex/figures/fig7_whytwoislands.png", dpi=300, bbox_inches="tight")
+fg.savefig(
+    f"../tex/figures/fig{FIGURE_NUMBER}_whytwoislands.png", dpi=300, bbox_inches="tight"
+)

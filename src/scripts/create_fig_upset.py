@@ -1,14 +1,18 @@
 """
-create_fig6_upset.py
+create_fig_upset.py
 ====================
-Script to create the upset plot for the DZs identified by the different methods
+Script to create the upset plot for the DZs identified by the different methods.
 """
+
+import sys
 
 import check_polluted as cp
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import upsetplot
+
+FIGURE_NUMBER = int(sys.argv[1])
 
 # ============
 # Loading data
@@ -57,9 +61,7 @@ known_DZ_dict = {
 
 upset_df = upsetplot.from_contents(DZ_dict)
 upset_df["pollution_status"] = [
-    "Known polluted" if cp.is_polluted(idd) == 1 else "All"
-    for idd in upset_df.id
-    # We want 'Total' to show up the total number of DZs; we're hacking the stackplot
+    "Known polluted" if cp.is_polluted(idd) == 1 else "All" for idd in upset_df.id
 ]
 
 # ============
@@ -89,22 +91,30 @@ totals_ax.barh(
 # ============
 # Restyling
 
-# For some reason, the overlap plot legend has the colours the wrong way around
-# Here we swap them around
+# Improving legibility of overlap axis
 overlap_ax = fg.axes[4]
 
-# Improving legitibility of ticks on overlap axis
-overlap_ax.set_yticks([0, 300, 600], minor=False)
-overlap_ax.set_yticks([100, 200, 400, 500], minor=True)
-overlap_ax.grid(axis="y", which="minor", alpha=0.3)
+overlap_ax.set_ylim(0, 230)
+overlap_ax.set_yticks([0, 50, 100, 150, 200], minor=False)
 overlap_ax.tick_params(axis="y", direction="in", which="both")
 
+overlap_ax.annotate("(578)", xy=(0.54, 240), fontsize=8, annotation_clip=False)
 
-# Improving legitibility of ticks on totals axis
+# Fixing the legend
+handles, labels = overlap_ax.get_legend_handles_labels()
+overlap_ax.legend(
+    handles[::-1],
+    labels[::-1],
+    loc="upper center",
+    ncol=2,
+)
+
+
+# Improving legibility of ticks on totals axis
 totals_ax.set_xticks([0, 500, 1000], minor=False)
 totals_ax.tick_params(axis="x", direction="in", which="both", labelsize=8)
 totals_ax.set_axisbelow(True)
 
 # ============
 
-fg.savefig("../tex/figures/fig6_upset.png", dpi=300, bbox_inches="tight")
+fg.savefig(f"../tex/figures/fig{FIGURE_NUMBER}_upset.png", dpi=300, bbox_inches="tight")

@@ -1,14 +1,17 @@
 """
-create_fig234_tsnefeatures.py
+create_fig_classes.py
 ==============================
-Creates further figures, identifying interesting features
-in the tSNE embedding
+Creates figures identifying interesting features in the tSNE embedding.
 """
+
+import sys
 
 import check_polluted as cp
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+
+FIGURE_NUMBERS = [int(sys.argv[i]) for i in range(1, len(sys.argv))]
 
 # =============================================================================
 # Load data
@@ -53,7 +56,11 @@ ax.set_xticks([])
 ax.set_yticks([])
 
 fg.tight_layout()
-fg.savefig("../tex/figures/fig3_DAsequence.png", dpi=300, bbox_inches="tight")
+fg.savefig(
+    f"../tex/figures/fig{FIGURE_NUMBERS[0]}_DAsequence.png",
+    dpi=300,
+    bbox_inches="tight",
+)
 
 # =============================================================================
 # Fig 3: DBs, DCs, DQs
@@ -122,7 +129,9 @@ ax.legend(
     fontsize=12,
 )
 
-fg.savefig("../tex/figures/fig4_DBCQ.png", dpi=300, bbox_inches="tight")
+fg.savefig(
+    f"../tex/figures/fig{FIGURE_NUMBERS[1]}_DBCQ.png", dpi=300, bbox_inches="tight"
+)
 
 # =============================================================================
 # Fig 4: MS stars and binaries
@@ -184,4 +193,6 @@ ax.legend(
     loc="upper left",
 )
 
-fg.savefig("../tex/figures/fig5_ms.png", dpi=300, bbox_inches="tight")
+fg.savefig(
+    f"../tex/figures/fig{FIGURE_NUMBERS[2]}_ms.png", dpi=300, bbox_inches="tight"
+)
