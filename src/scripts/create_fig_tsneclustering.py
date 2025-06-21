@@ -62,8 +62,8 @@ cbar = plt.colorbar(
     plt.cm.ScalarMappable(cmap=cmap), cax=axs["cbar"], orientation="horizontal"
 )
 cbar.set_ticks([1 / 24, 3 / 24])
-cbar.set_ticklabels(["Cool\nDZs", "Warm\nDZs"], fontsize=12)
-cbar.set_label(r"DBSCAN clustering of $t$SNE embedding", fontsize=14, labelpad=-12)
+cbar.set_ticklabels(["Cool", "Warm"], fontsize=12)
+cbar.set_label(r"DBSCAN clustering of $t$SNE embedding", fontsize=14, labelpad=0)
 
 ax = axs["umap"]
 for i in np.unique(dbscan.labels_):

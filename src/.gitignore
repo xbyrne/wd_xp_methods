@@ -2,7 +2,7 @@
 bin/*
 
 *.ipynb
-*.png
+# *.png
 
 *.npz
 *.xml

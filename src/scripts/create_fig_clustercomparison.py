@@ -32,7 +32,7 @@ ax.hist(
     color=["orange", "r"],
     stacked=True,
     bins=BINS,
-    label=["Cool DZs", "Warm DZs"],
+    label=["'Cool' island", "'Warm' island"],
 )
 
 ax.set_xticks(BINS[1::2])

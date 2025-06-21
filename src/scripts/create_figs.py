@@ -7,8 +7,9 @@ Orchestrator script to create all the figures
 import subprocess
 
 SCRIPT_ARGUMENTS = {
-    "create_fig_tsneembedding.py": 2,
-    "create_fig_tsneclustering.py": 3,
+    "create_fig_tsneembedding.py": 1,
+    "create_fig_tsneclustering.py": 2,
+    "create_fig_coaddedspectrum.py": 3,
     "create_fig_classes.py": [4, 5, 6],
     "create_fig_upset.py": 7,
     "create_fig_whytwoislands.py": 8,
