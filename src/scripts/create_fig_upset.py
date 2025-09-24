@@ -18,11 +18,11 @@ FIGURE_NUMBER = int(sys.argv[1])
 # Loading data
 
 # Random forests
-garciazamora23 = pd.read_csv(
-    "../data/external/previous_work/garciazamora23.csv", index_col=0
+garciazamora25 = pd.read_csv(
+    "../data/external/previous_work/garciazamora25.csv", index_col=0
 )
-random_forest_DZs = garciazamora23.index[
-    ["Z" in sp for sp in garciazamora23["SPPred"]]
+random_forest_DZs = garciazamora25.index[
+    ["Z" in sp for sp in garciazamora25["SPPred"]]
 ].values
 
 # Gradient boosted trees
@@ -71,7 +71,7 @@ fg, ax = plt.subplots(figsize=(8, 4))
 
 up = upsetplot.UpSet(
     upset_df,
-    min_subset_size=20,
+    min_subset_size=15,
     sort_categories_by="input",
     intersection_plot_elements=0,
 )
@@ -105,7 +105,7 @@ handles, labels = overlap_ax.get_legend_handles_labels()
 overlap_ax.legend(
     handles[::-1],
     labels[::-1],
-    loc="upper center",
+    loc="upper right",
     ncol=2,
 )
 

@@ -75,10 +75,10 @@ The members of these islands are decided objectively using DBSCAN (Ester+96), wh
 
 ### Comparing previous methods
 
-The classifications of García-Zamora+23 and Vincent+24 are, commendably, available online at the VizieR catalogues 'J/A+A/679/A127/catalog' and 'J/A+A/682/A5/catalog' respectively. The queries
+The classifications of García-Zamora+25 and Vincent+24 are, commendably, available online at the VizieR catalogues 'J/A+A/699/A3/table3' and 'J/A+A/682/A5/catalog' respectively. The queries
 ```sql
-SELECT GaiaDR3, SPPred
-FROM "J/A+A/679/A127/catalog"
+SELECT GaiaEDR3, SPPred
+FROM "J/A+A/699/A3/table3"
 ```
 and
 ```sql
@@ -114,6 +114,7 @@ Andrae+23
 Dufour+17
 Ester+96
 Gaia Collaboration, Montegriffo+22
+García-Zamora+25
 Gentile Fusillo+24
 Kao+24
 Lindegren+18

@@ -26,11 +26,11 @@ tsne_pwds = np.concatenate((fl["cool_DZs"], fl["warm_DZs"]))
 tsne_unknown_ids = np.array([id_ for id_ in tsne_pwds if cp.is_polluted(id_) == -1])
 
 # Sources identified by just tSNE
-garciazamora23 = pd.read_csv(
-    "../data/external/previous_work/garciazamora23.csv", index_col=0
+garciazamora25 = pd.read_csv(
+    "../data/external/previous_work/garciazamora25.csv", index_col=0
 )
-random_forest_pwds = garciazamora23.index[
-    ["Z" in sp for sp in garciazamora23["SPPred"]]
+random_forest_pwds = garciazamora25.index[
+    ["Z" in sp for sp in garciazamora25["SPPred"]]
 ].values
 
 vincent24 = pd.read_csv("../data/external/previous_work/vincent24.csv", index_col=0)
