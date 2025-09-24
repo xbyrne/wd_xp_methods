@@ -64,6 +64,7 @@
 \newcommand{\Pwd}{P_\mathrm{WD}}
 \newcommand\xb{\vb{x}}
 \newcommand\yb{\vb{y}}
+\newcommand{\red}[1]{\textcolor{red}{#1}}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -115,7 +116,7 @@ The \textit{Gaia} mission's third data release recorded low-resolution spectra f
 A small subset of these spectra show evidence of characteristic broad Ca~\textsc{ii} absorption features, implying the accretion of rocky material by so-called polluted white dwarfs -- important probes of the composition of exoplanetary material.
 Several supervised and unsupervised data-intensive methods have recently been applied to identify polluted white dwarfs from the \textit{Gaia} spectra.
 We present a comparison of these methods, along with the first application of $t$-distributed stochastic neighbour embedding ($t$SNE) to this dataset.
-We find that $t$SNE outperforms the similar technique Uniform Manifold Approximation and Projection (UMAP), isolating over 50\% more high-confidence polluted candidates, including 44 new candidates which are not selected by any other method investigated and which have not been observed at higher resolution.
+We find that $t$SNE outperforms the similar technique Uniform Manifold Approximation and Projection (UMAP), isolating over 50\% more high-confidence polluted candidates, including \red{39} new candidates which are not selected by any other method investigated and which have not been observed at higher resolution.
 Supervised methods benefit greatly from data labels provided by earlier works, selecting many known polluted white dwarfs which are missed by unsupervised methods.
 Our work provides a useful case study in the selection of members of rare classes from a large, sporadically labelled dataset, with applications across astronomy.
 \end{abstract}
@@ -137,19 +138,26 @@ WDs constitute a highly uniform population, and are therefore ideal astrophysica
 The presence of metal `pollution' in the spectra of WDs reveals the composition of rocky bodies in the system.
 Following a star's post-MS evolution, exoplanetary bodies can be scattered onto star-grazing orbits \citep{debes02, bonsor11, frewen14, mustill18, maldonado20dyn, maldonado20und}, tidally disrupted \citep{jura03, veras14}, and then accreted onto the WD \citep{brouwers22}.
 This has been shown to be the dominant mechanism behind the appearance of metal features in the spectra of so-called polluted WDs \citep[e.g.,][]{farihi10, veras16}.
-By fitting WD atmosphere models to the polluted WD spectra \citep[e.g.][]{koester10, blouin18, badenasagusti24}, one can post-mortem constrain the bulk composition, and thus geology, of the accreted parent body \citep[e.g.][]{xu21}.
+By fitting WD atmosphere models to the polluted WD spectra \red{
+\citep[e.g.][]{koester05, koester11, dufour07, hollands17, hollands18, blouin18, badenasagusti24}
+}, one can post-mortem constrain the bulk composition, and thus geology, of the accreted parent body \citep[e.g.][]{xu21}.
 
 The \textit{Gaia} mission \citep{gaia} has revolutionized the study of WDs.
 The mission's second data release (DR2) identified over $262\,000$ high-confidence WD candidates, an increase by almost an order of magnitude on the then-state-of-the-art \citep{gentilefusillo19, gaiadr2}.
 This increased further to over $359\,000$ thanks to the improved astrometry and photometry of \textit{Gaia}'s Early Data Release 3 \citep[EDR3;][]{gentilefusillo21, gaiadr3}.
 In addition to astrometric and photometric measurements, the full \textit{Gaia} DR3 also provides low-resolution ($R\sim70$) spectra for 219 million sources
 \citep{carrasco21, gaiadr3}, including $\approx100\,000$ WD candidates \citep{gentilefusillo21}.
-These so-called XP spectra are stored not as fluxes in a sequence of wavelength bins, but rather as a set of 110 coefficients $c_n$ to a series of basis functions; the true spectra can be reconstructed using the \texttt{GaiaXPy} Python package\footnote{
+\red{
+These spectra -- called `BP/RP spectra'; collectively `XP spectra' -- are stored not as fluxes in a sequence of wavelength bins, but as a pair of 55-coefficient Hermite polynomials.
+They can therefore be represented by a 110-dimensional coefficient vector $\xb\in\mathbb{R}^{110}$.
+The Hermite polynomials approximating the spectrum
+}
+can be reconstructed using the \texttt{GaiaXPy} Python package\footnote{
     \url{https://gaia-dpci.github.io/GaiaXPy-website/}
 }.
 
 While an XP spectrum is not sufficient to classify a WD as polluted or not (let alone fit elemental abundances) they indicate which WDs from this large dataset to observe with targeted spectroscopic campaigns at higher resolution.
-The high surface gravities of WDs ($\sim 10^8\,\text{g cm}^{-2}$) cause significant collisional broadening, allowing metal pollution to be detected in even low-resolution spectra, usually from the strong Ca H and K lines.
+The high surface gravities of WDs ($\sim 10^8\,\text{g cm}^{-2}$) cause significant collisional broadening, allowing metal pollution to be detected in even low-resolution spectra, usually from the strong Ca H and K lines \red{at $3933$ and $3968~\text{\AA}$}.
 
 Several techniques have recently been applied to the large \textit{Gaia} XP sample to identify polluted WD candidates:
 \begin{itemize}
@@ -171,12 +179,17 @@ DB (neutral helium features),
 DC (no features),
 DO (ionized helium),
 DQ (carbon),
-and DZ (metals).
+and DZ (metals)\footnote{
+    \red{
+        This classification scheme was first outlined in \citet{sion83}; the `D' stands for `degenerate'.
+    }
+}.
 They classify $1~272$ WDs as DZs.
 \item \textbf{Random forests \citep{breiman01}}.
 A random forest consists of a large ensemble of decision trees, which are trained to classify data.
-\citet{garciazamora23} apply this method to classify $12\,351$ \textit{Gaia} WDs within $100\,\text{pc}$, to (i) differentiate between DA and non-DA WDs; (ii) classify non-DA WDs into DB, DC, DQ, and DZ WDs; (iii) subclassify each spectral class (e.g., DBA vs DBZ).
-They classify 310 WDs as polluted (DZ, DAZ, etc.).
+\red{\citet{garciazamora25}} apply this method to classify \red{$78\,920$}
+\textit{Gaia} WDs within $\red{500}\,\text{pc}$, to (i) differentiate between DA and non-DA WDs; (ii) classify non-DA WDs into DB, DC, DQ, and DZ WDs.
+They classify \red{785} WDs as \red{DZ}.
 \end{itemize}
 
 The first two of these methods are \textit{unsupervised}; the latter two are \textit{supervised}.
@@ -208,8 +221,12 @@ Section~\ref{sec:conclusion} concludes our work.
 
 \subsection{\textit{t}SNE} \label{sec:tsne}
 
-$t$SNE is a technique for mapping a dataset of high-dimensional points $\xb\in\mathbb{R}^D$ into two-dimensional points $\yb\in\mathbb{R}^2$, while preserving the pairwise distances between the points as well as possible.
-This is achieved by defining two \textit{similarity} functions -- one for the original $D$-dimensional space, one for two dimensions -- and then minimizing the difference between the two similarity distributions with respect to the projected 2D points.
+
+\red{
+$t$SNE is a technique for mapping a dataset of high-dimensional points $\xb\in\mathbb{R}^D$ into lower-dimensional points $\yb\in\mathbb{R}^d$, while preserving local structure probabilistically.
+The lower dimensionality $d<D$ is usually either 2 or 3; we use $d=2$ throughout.
+This dimensionality reduction is achieved by defining two \textit{similarity} functions -- one for the original $D$-dimensional space, another for $d$ dimensions -- and then minimizing the difference between the two similarity distributions with respect to the projected ($d$-dimensional) points.
+}
 
 The similarity between two points $\xb_i, \xb_j \in \mathbb{R}^D$ is defined by
 \begin{equation}
@@ -221,9 +238,16 @@ p_{i|j} = \frac{
     \exp\qty(-\norm{\xb_i - \xb_j} / 2\sigma^2)
 }{
     \sum_{k\neq j} \exp\qty(-\norm{\xb_k - \xb_j} / 2 \sigma^2)
-},
+}.
 \end{equation}
-where $\sigma$ is a hyperparameter known as the \textit{perplexity}.
+\red{
+The parameter $\sigma$ is internally optimised such that this similarity distribution achieves a particular user-defined value of the \textit{perplexity} $\mathrm{Perp}(p_i)$:
+\begin{equation}
+\log_2\mathrm{Perp}(p_i) \equiv
+    -\sum_j p_{j|i} \log_2 p_{j|i};
+\end{equation}
+the right-hand side being recognizable as the Shannon entropy of the similarity distribution in bits \citep{vandermaaten08}.
+}
 In 2D, the similarity is instead defined according to a Cauchy distribution:
 \begin{equation}
 q_{ij} = \frac{
@@ -235,7 +259,7 @@ q_{ij} = \frac{
 The use of a Cauchy distribution -- which has broader tails than a normal distribution -- addresses the `crowding problem', a phenomenon permitting high-dimensional points to have many more close neighbours than 2D points \citep{vandermaaten08}.
 
 Ideally, the pairwise distances $\norm{\yb_i-\yb_j}$ in the embedding should be as close as possible to the corresponding $\norm{\xb_i-\xb_j}$ in the original data space.
-$t$SNE therefore proceeds by minimizing the difference between the two similarity distributions, as quantified by the Kullback-Leibler divergence \citep{kullbackleibler}:
+$t$SNE therefore proceeds by \red{probabilistically} minimizing the difference between the two similarity distributions, as quantified by the Kullback-Leibler divergence \citep{kullbackleibler}:
 \begin{equation}
 \mathcal{KL}(p||q)
 \equiv \sum_{i, j} p_{ij} \log \qty(
@@ -245,9 +269,11 @@ $t$SNE therefore proceeds by minimizing the difference between the two similarit
 The embedding is constructed by minimizing this divergence with respect to the 2D points $\{\yb_i\}$, for instance by gradient descent.
 
 For our purposes, each vector $\xb_i$ is a 110-dimensional vector, each of whose components is an XP spectral coefficient.
-To account for sources being of different apparent magnitude -- a parameter irrelevant to their classification -- these coefficients are first normalized by the \textit{G}-band flux; we found this to yield more effective embeddings than L2 or unit-Gaussian normalization.
-Our results are not sensitive to the value of $\sigma$ between about 30 and 120; we henceforth take $\sigma=50$.
-We use the \textsc{scikit-learn} implementation of $t$SNE throughout \citep{sklearn}.
+To account for sources being of different apparent magnitude -- a parameter irrelevant to their classification -- these coefficients are first \red{divided} by the \textit{G}-band flux; we found \red{that this normalization enabled easier isolation of polluted WD candidates in the embedding, compared to} L2 or unit-Gaussian normalization.
+Our results are not sensitive to \red{perplexity values} between about 30 and 120; we henceforth \red{use a perplexity of 50}.
+\red{
+We use the implementation of $t$SNE provided in the \textsc{scikit-learn} Python package \citep{sklearn} throughout, and use their default values for hyperparameters other than the perplexity.
+}
 
 
 \subsection{Sample selection}
@@ -319,7 +345,12 @@ Two of these islands show a high purity of known polluted WDs, suggesting that m
 \end{figure}
 
 Which sources belong to these islands can be decided objectively using clustering algorithms, such as the well-known Density-Based Spatial Clustering of Applications with Noise \citep[DBSCAN;][]{ester96} algorithm.
-We apply the \texttt{scikit-learn} implementation of this algorithm to the $t$SNE embedding, with parameters $\mathtt{eps}=2$ and $\mathtt{min\_samples}=30$, identifying twelve clusters, of which two correspond to the polluted islands (Fig.~\ref{fig:tsneclustering}(a)).
+We apply the \texttt{scikit-learn} implementation of this algorithm to the $t$SNE embedding, with parameters\footnote{
+    \red{
+        The two parameters \texttt{eps} and \texttt{min\_samples} define the clustering.
+        Briefly, each member of a cluster either has at least \texttt{min\_samples} points within a distance \texttt{eps}, or is at most \texttt{eps} away from such a point.
+    }
+} $\mathtt{eps}=2$ and $\mathtt{min\_samples}=30$, identifying twelve clusters, of which two correspond to the polluted islands (Fig.~\ref{fig:tsneclustering}(a)).
 We refer to these as the `cool' and the `warm' islands, owing to their respective temperature distributions (see Section~\ref{sec:whytwo}).
 
 The UMAP embedding constructed in \citet{kao24} also contained a feature populated mostly by many known polluted WDs (see their fig.~2 and 3), but it is slightly blurred with other features, making membership less certain for some sources.
@@ -342,22 +373,34 @@ The reasons for this difference in clustering behaviour between the two algorith
 With the members of each island definitively ascertained, we find that the `cool' island contains 478 sources, of which 97 are known polluted WDs and 11 are known non-polluted WDs.
 The `warm' island contains 229 sources, of which 50 are known polluted WDs and 2 are known non-polluted WDs.
 The remaining 547 `unknown' objects (across both islands) do not appear in any of the spectroscopic databases mentioned in Section~\ref{sec:evaluation}, but given that these objects have been clustered together based on similar features in their XP spectra, it is likely that a large proportion are as-yet-unidentified polluted WDs.
-44 of these sources are not selected by any of the other methods compared later in Section~\ref{sec:comparison}, and are selected only by $t$SNE.
+\red{39} of these sources are not selected by any of the other methods compared later in Section~\ref{sec:comparison}, and are selected only by $t$SNE.
 In the co-added XP spectrum of these `unknown' sources (Fig.~\ref{fig:coaddedspectrum}), there is a clear Ca~\textsc{ii} feature, suggesting that a significant fraction of these candidates are indeed polluted WDs.
+
+\red{
+Of the 13 `known non-polluted' objects seemingly erroneously located on the two polluted islands, most may in fact be polluted after all.
+Eight are classified as DC or DA based on spectra whose wavelength coverage does not include the diagnostic Ca~\textsc{II} features at $3933$ and $3968~\text{\AA}$.
+Two others rely on very low-quality ($\mathrm{S/N}\lesssim2$) SDSS spectra classified tentatively as DCs by the data-driven pipeline of \citet{vincent23}.
+As such, ten of the 13 putative false positives might not be false positives at all, though the remaining three objects appear to be genuine DCs that have been erroneously selected here.
+}
 
 \begin{figure*}
 \centering
 \includegraphics[width=\textwidth]{figures/fig3_coaddedspectrum.png}
 \caption{
     Co-added \textit{Gaia} XP spectra of polluted WD candidates selected by $t$SNE that have not been observed at higher resolution (`unknown').
-    The upper blue line stacks the 44 candidates which are selected only by $t$SNE.
+    The upper blue line stacks the \red{39} candidates which are selected only by $t$SNE.
     The lower black line stacks all 547 `unknown' candidates selected by $t$SNE, most of which are also selected by at least one other method (see Section~\ref{sec:comparison}).
+    \red{The two spectra are offset arbitrarily for visualisation purposes.}
     The clear Ca~\textsc{ii} feature just below $400~\text{nm}$ suggests that many of these candidates are genuine polluted WDs.
 }
 \label{fig:coaddedspectrum}
 \end{figure*}
 
-Running UMAP on the sample (Fig.~\ref{fig:tsneclustering}(b)) gives a qualitatively similar embedding to that of \citet[cf.\ their fig.~2]{kao24}.
+Running UMAP on the sample (Fig.~\ref{fig:tsneclustering}(b)) gives a qualitatively similar embedding to that of \citet[cf.\ their fig.~2]{kao24}\footnote{
+    \red{
+        The same hyperparameters were used as in the cited work: $\mathtt{n\_neighbours}=25$ and $\mathtt{min\_dist}=0.05$.
+    }
+}.
 The WDs from our `cool' island appear in a similar location to those selected in their work; indeed 435 sources are common to both.
 However, the WDs from our `warm' island are deeply entrenched in the diagonal feature of the UMAP embedding, and could therefore not have been isolated using UMAP.
 
@@ -425,7 +468,7 @@ The reasons for the identification of these spectral classes is beyond the scope
 
 Here we compare the ability of five data-driven methods, including $t$SNE, in identifying polluted WDs from the \textit{Gaia} XP spectra.
 
-\citet{garciazamora23} apply random forests, listing the classifications of $12~351$ WDs within $100\,\text{pc}$, classifying 310 as polluted (DZ, DZA, DBZA etc.).
+\red{\citet{garciazamora25} apply random forests, listing the classifications of $78~920$ WDs within $500\,\text{pc}$, classifying 785 as polluted (DZ).}
 \citet{vincent24} use gradient tree boosting to classify a larger sample of $100~886$ WD candidates, classifying $1~272$ DZs.
 \citet{kao24} obtain $465$ polluted WD candidates from a sample of $96~134$ using UMAP; although this sample is not publicly available, it was acquired by personal communication.
 We were able to approximately reproduce the SOM-based selection of polluted WDs by \citet{perezcouto24} identifying 451 WDs in two neurons containing a high number of known DZs (the original work reports 467).
@@ -445,16 +488,16 @@ The performance of the supervised methods is likely exaggerated, as many of the 
     \hline
     & RF* & GTB* & SOM$\dagger$ & UMAP & $t$SNE \\
     \hline
-    Known polluted & 189 & 350 & 51 & 96 & 147\\
-    & (61\%) & (28\%) & (11\%) & (21\%) & (21\%) \\
+    Known polluted & \red{419} & 350 & 51 & 96 & 147\\
+    & \red{(53\%)} & (28\%) & (11\%) & (21\%) & (21\%) \\
     % \hline
-    Known non-poll. & 3 & 38 & 14 & 12 & 13 \\
-    & (1.0\%) & (3.0\%) & (3.1\%) & (2.6\%) & (1.8\%) \\
+    Known non-poll. & \red{2} & 38 & 14 & 12 & 13 \\
+    & \red{(0.3\%)} & (3.0\%) & (3.1\%) & (2.6\%) & (1.8\%) \\
     % \hline
-    Unknown & 118 & 884 & 386 & 357 & 547 \\
-    & (38\%) & (69\%) & (86\%) & (77\%) & (77\%) \\
+    Unknown & \red{364} & 884 & 386 & 357 & 547 \\
+    & \red{(46\%)} & (69\%) & (86\%) & (77\%) & (77\%) \\
     % \hline
-    Total & 310 & 1~272 & 451 & 465 & 707 \\
+    Total & \red{785} & 1~272 & 451 & 465 & 707 \\
     \hline
  \end{tabular}
 *~Supervised method: performance likely overestimated (see Section~\ref{sec:evaluation}).\\
@@ -470,22 +513,22 @@ $\dagger$ Based on an approximate reproduction of \citet{perezcouto24}.
     These plots show the same information as a five-set Venn diagram, but in a less cluttered manner.
     The lower left panel shows the total number of sources identified as polluted by each method, as well as the subset of those that are known polluted WDs (these data are also given in Table~\ref{tab:evaluation}).
     The rest of the plot shows the numbers of candidates selected by only one method (first five columns), and by various combinations of methods (shown by the connectors).
-    For example, 88 sources are selected only by random forests; 140 are selected by $t$SNE and gradient tree boosting and none of the other three methods; just 40 are selected by all five methods (rightmost column).
-    For visualization purposes, only subsets with at least 20 sources are shown, and the second column (candidates selected only by gradient tree boosting) is clipped.
+    For example, \red{130} sources are selected only by random forests; \red{64} are selected by $t$SNE and gradient tree boosting and none of the other three methods; \red{126} are selected by all five methods (rightmost column).
+    For visualization purposes, only subsets with at least \red{15} sources are shown, and the second column (candidates selected only by gradient tree boosting) is clipped.
     A large number of candidates are selected only by one or two of the methods, even among the known polluted WDs.
-    44 unknown candidates are selected by $t$SNE and no other method.
+    \red{39} unknown candidates are selected by $t$SNE and no other method.
 }
 \label{fig:overlap}
 \end{figure*}
 
-
-Random forests are by far the most successful in terms of true positive rate (61\%) and false positive rate (1\%).
-However, \citet{garciazamora23} only apply this method to WD candidates within $100~\text{pc}$, which are on average brighter ($\bar{\mathit{G}}=17.9$) and thus higher-signal-to-noise than the larger samples explored in the other works ($\bar{\mathit{G}}=18.4$).
-As such it is unlikely that a similarly large fraction of the `unknown' sources will prove to be polluted if observed at higher resolution.
-Whether the high performance of random forests would be preserved on application to a larger, lower-mean-signal-to-noise sample is left for future work.
+\red{
+Random forests are by far the most successful in terms of true positive rate (53\%) and false positive rate (0.3\%).
+Furthermore, \citet{garciazamora25} quote an impressive precision (fraction of selected objects which are selected correctly) of 95\% for DZs.
+As such, a large proportion of the 364 `unknown' sources selected by random forests are expected to be genuine polluted WDs, though perhaps not 95\%: `known' objects are naturally biased towards objects which are nearer, have higher-quality data, and are thus more likely to be classified correctly.
+}
 
 Gradient tree boosting, another supervised method, outperforms the three unsupervised methods (SOMs, UMAP, $t$SNE) in identifying polluted WD candidates.
-On a similar sample size ($\approx 100~000$), this method correctly recovers the largest number (350) of known polluted WDs, while maintaining a low false positive rate ($3.0\%$).
+On a similar sample size ($\approx 100~000$), this method correctly recovers the \red{350} known polluted WDs, while maintaining a low false positive rate ($3.0\%$).
 Again, however, many of the known polluted WDs are present in the training set used by \citet{vincent24}, so a smaller proportion of the unknown sources might turn out to be genuine polluted WDs.
 
 Among the unsupervised methods, UMAP and $t$SNE have similar true positive rates (21\%), though $t$SNE has a slightly better false positive rate (1.8\% vs.\ 2.6\%).
@@ -498,7 +541,7 @@ However, we show that it can be a useful complement to other methods in Section~
 
 It might be expected that each method would `learn' to identify metal-polluted XP spectra in similar ways, and hence that the candidates selected by the different methods would significantly overlap.
 However, a significant number of candidates are selected only by one or two of the five methods explored here, as shown in Fig~\ref{fig:overlap}.
-Only 40 candidates are selected by all five.
+Only \red{126} candidates are selected by all five.
 Even among the known polluted WDs, every method misses a significant number which were selected by at least one other method, and conversely each method selects some known polluted WDs which are not selected by any other method.
 
 These discrepancies suggest that different methods pick up on different features in the data to identify polluted WDs.
@@ -522,9 +565,9 @@ We briefly justify here that these spectra are indeed useful in identifying poll
 
 The ultimate justification is empirical: the vast majority of sources identified as polluted WDs based on XP spectra do indeed turn out to be so, when observed at higher resolution.
 A preliminary success rate of 99 per cent is reported on spectroscopic follow-up survey of the sample identified by UMAP \citep{kao24}.
-We report a similarly high success rate on those polluted candidates identified by $t$SNE that have been observed in the first data release of DESI \citep{desidr1}.
-
-
+\red{
+We report a similarly high preliminary success rate for the $t$SNE-identified polluted candidates by cross-matching to DESI DR1 \citep{desidr1} and briefly visually inspecting the higher-resolution spectra therein.
+}
 
 
 \subsection{Why two groups of polluted WDs?}
@@ -559,7 +602,7 @@ $t$SNE empirically appears to have prioritized the co-location of sources of sim
 \includegraphics[width=\columnwidth]{figures/fig9_clustercomparison.png}
 \caption{
     Stacked histogram of estimated effective temperatures of sources selected by $t$SNE on the `cool' and `warm' islands.
-    The temperatures here are of the H-atmosphere WD atmosphere model that best fit the sources' de-reddened photometry \citep{gentilefusillo21}.
+    The temperatures here are of the H-atmosphere WD atmosphere model that best fit the sources' de-reddened photometry \citep{gentilefusillo21}\red{; the temperature axis is inverted to follow the embeddings in Fig.~\ref{fig:whytwoislands}.}
     Although the temperature distributions are systematically different, there is a significant overlap.
 }
 \label{fig:tempdistr}
@@ -586,7 +629,7 @@ As such, the cool end of the DA sequence (upper right of Fig.~\ref{fig:DAs}) wra
 Of course, global structure preservation is desirable for other use cases, such as visualizing trends across the whole dataset; for such tasks $t$SNE is known to be less appropriate than UMAP \citep{mcinnes18}.
 
 $t$SNE is much slower than UMAP for this dataset of $\approx 100~000$ objects, taking of order $5\text{-}10\,\text{mins}$ compared to $\sim1\,\text{min}$ for UMAP; we corroborate this finding of \citet{kao24}.
-$t$SNE has a complexity of $\mathcal{O}(N \log N)$, so its use may become impractical for datasets a few orders of magnitude larger\footnote{
+$t$SNE has a \red{time} complexity of $\mathcal{O}(N \log N)$, so its use may become impractical for datasets a few orders of magnitude larger\footnote{
     Standard $t$SNE has a complexity of $\mathcal{O}(N^2)$, but the commonly-used Barnes-Hut algorithm \citep{barnes86} accelerates this to $\mathcal{O}(N\log N)$ \citep{vandermaaten13}.
 }.
 
@@ -599,15 +642,18 @@ In this subsection we make recommendations on which of the methods mentioned abo
 Where a significant number of high-quality training labels are available, supervised methods outperform unsupervised methods.
 These labels constitute highly relevant information that supervised methods can exploit to select members of rare classes at high true positive and low false negative rates, as shown in Table~\ref{tab:evaluation}.
 Care must be taken to ensure that the labels are accurate, as inaccurate training labels can have a highly detrimental effect on model performance.
-Furthermore, for selecting members of very rare classes, class imbalance may become problematic, though there exist several mitigation strategies such as data augmentation and resampling.
+Furthermore, for selecting members of very rare classes, class imbalance may become problematic, though there exist several mitigation strategies such as data augmentation and resampling \citep[see also][]{vincent25}.
 In this case, the high performance of random forests and gradient tree boosting show that the benefits of training labels outweigh the obstacle of class imbalance, even without these mitigation strategies.
 
 Among unsupervised methods, $t$SNE outperforms UMAP and SOMs in the selection of rare classes.
 As discussed in Section~\ref{sec:tsnevumap}, UMAP can sacrifice the co-identification of members of rare classes in favour of preserving the global dataset structure.
 SOMs -- and indeed any neural-network-based methodology -- are highly flexible, but require the tuning of a large number of hyperparameters: numbers of neurons, hidden layer sizes, learning rate, etc.
 We also attempted to apply two further neural-network-based methods -- contrastive learning \citep{chen20} and disentangled representation learning \citep[e.g.][]{wang24} -- but found there to be far more hyperparameters to tune, compared to $t$SNE and UMAP\footnote{
-    $t$SNE requires only one important hyperparameter: the perplexity $\sigma$ (see Section~\ref{sec:tsne}).
-    UMAP requires two: \texttt{n\_neighbours} and \texttt{min\_dist} (see e.g.\ \citet{kao24}, their section~3.1).
+\red{
+    $t$SNE has only one main hyperparameter: the perplexity (see Section~\ref{sec:tsne}).
+    UMAP has two: \texttt{n\_neighbours} and \texttt{min\_dist} (see e.g.\ \citet{kao24}, their section~3.1).
+    While both methods do have further hyperparameters (such as the number of iterations to perform), the results are generally less sensitive to these.
+}
 }.
 
 The methods examined here show complementary behaviour, each identifying candidates that were missed by the other methods (Fig.~\ref{fig:overlap}).
@@ -620,7 +666,7 @@ For example, a dataset with a very low number of training labels would favour th
 
 We have compared five different methods in their ability to select polluted WDs from low-resolution \textit{Gaia} XP spectra.
 Among these methods we present the use of $t$SNE, which we find to outperform other unsupervised methods, identifying a population of warmer polluted candidates that was missed by UMAP, a similar technique.
-44 candidates selected using $t$SNE are not selected by any other method and lack spectroscopic observations at higher resolution.
+\red{39} candidates selected using $t$SNE are not selected by any other method and lack spectroscopic observations at higher resolution.
 The availability of high-quality training labels is found to confer a significant advantage to supervised methods such as random forests and gradient tree boosting, especially for the highest signal-to-noise data.
 We frame this work as a case study in the common task of selecting members of a rare class from a large, sparsely labelled dataset.
 As Astronomy surges into the `Big Data' era, the ability to identify such interesting classes of object is crucial to a broad range of astronomical problems.
@@ -634,6 +680,9 @@ We thank Malia Kao and Xabier P\'erez-Couto for detailed discussions and suggest
 We thank Sarah Kane for advice on the acquisition of the \textit{Gaia} XP spectra, and Keith Hawkins for advice on normalizing them.
 
 This work has made use of data from the European Space Agency (ESA) mission {\it Gaia} (\url{https://www.cosmos.esa.int/gaia}), processed by the {\it Gaia} Data Processing and Analysis Consortium (DPAC, \url{https://www.cosmos.esa.int/web/gaia/dpac/consortium}). Funding for the DPAC has been provided by national institutions, in particular the institutions participating in the {\it Gaia} Multilateral Agreement.
+\red{
+We have also made use of the Python package GaiaXPy, developed and maintained by members of the Gaia DPAC, and in particular, Coordination Unit 5 (CU5), and the Data Processing Centre located at the Institute of Astronomy, Cambridge, UK (DPCI).
+}
 
 We are grateful to the Leibniz-Institute for Astrophysics Potsdam (AIP) for hosting the GAIA@AIP service, which greatly streamlined the collection of the \textit{Gaia} data used in this work.
 
@@ -644,11 +693,13 @@ In addition to Python packages referenced in the text, we also acknowledge the u
 
 LKR is supported by the international Gemini Observatory, a program of NSF NOIRLab, which is managed by the Association of Universities for Research in Astronomy (AURA) under a cooperative agreement with the U.S. National Science Foundation, on behalf of the Gemini partnership of Argentina, Brazil, Canada, Chile, the Republic of Korea, and the United States of America.
 
+\red{Finally, we gratefully acknowledge two anonymous reviewers, whose numerous comments and suggestions greatly improved this work.}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section*{Data Availability}
 
-The classifications of \citet{garciazamora23}\footnote{
-    \url{https://cdsarc.cds.unistra.fr/viz-bin/cat/J/A+A/679/A127}
+The classifications of \citet{garciazamora25}\footnote{
+    \url{https://cdsarc.cds.unistra.fr/viz-bin/cat/J/A+A/699/A3}
 } and \citet{vincent24}\footnote{
     \url{https://cdsarc.cds.unistra.fr/viz-bin/cat/J/A+A/682/A5}
 } are publicly available on the VizieR platform \citep{ochsenbein00}.
