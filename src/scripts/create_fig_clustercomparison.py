@@ -35,10 +35,11 @@ ax.hist(
     label=["'Cool' island", "'Warm' island"],
 )
 
-ax.set_xticks(BINS[1::2])
-ax.tick_params(labelsize=12)
 ax.set_xlabel(r"Fitted $T_\mathrm{eff}$ [$10^3~\text{K}$]", fontsize=14)
+ax.xaxis.set_inverted(True)
+ax.set_xticks(BINS[1::2])
 ax.set_yticks([])
+ax.tick_params(labelsize=12, length=4)
 ax.legend(fontsize=12)
 
 fg.savefig(
